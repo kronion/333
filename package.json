@@ -1,0 +1,23 @@
+{
+  "name": "333_Project",
+  "description": "Final COS 333 Project, Spring 2014",
+  "version": "0.0.1",
+  "contributors": [
+    {
+      "name": "Collin Stedman"
+    }
+  ],
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kronion/333.git"
+  },
+  "dependencies": {
+    "express": "3.x"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-contrib-jshint": "~0.8.0"
+  }
+}
