@@ -13,7 +13,10 @@
     "url": "https://github.com/kronion/333.git"
   },
   "dependencies": {
-    "express": "3.x"
+    "express": "3.x",
+    "passport": "~0.2.0",
+    "passport-local": "~0.1.6",
+    "jade": "~1.3.0"
   },
   "devDependencies": {
     "grunt": "~0.4.2",

@@ -1,2 +1,3 @@
 # Ignoring node_modules and keeping dependencies with 'npm shrinkwrap'
 node_modules
+keyfile.js
