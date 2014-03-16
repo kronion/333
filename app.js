@@ -40,6 +40,24 @@ app.use(express.cookieParser())
 /* Passport */
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    User.findOne( { username: username }, function (err, user) {
+      if (err) { 
+        return done(err); 
+      }
+      if (!user) {
+        return done(null, false, { message: 'Incorrect username or password.' });
+      }
+      if (user.password != password) {
+        return done(null, false, { message: 'Incorrect password or password.' });
+      }
+      return done(null, user);
+    });
+  }
+));
+
 app.use(passport.initialize())
    .use(passport.session());
 
@@ -54,4 +72,9 @@ app.get('/', function(req, res) {
 app.get('/test', function(req, res) {
   res.render('layout.jade');
 });
+app.post('/login', 
+  passport.authenticate('local', { successRedirect: '/',
+                                   failureRedirect: '/login',
+                                   failureFlash: true }));
+
 app.listen(1337);
