@@ -26,12 +26,17 @@ app.use(express.compress())
    .use(express.static(__dirname + '/public'));
 
 /* Sessions */
+var CasStore = require('connect-cassandra-cql')(express),
+    CasClient = require('node-cassandra-cql').Client;
+var client = new CasClient({ hosts: ['localhost'], keyspace: 'system' });
+var config = { client: client };
 app.use(express.cookieParser())
    .use(express.json())
    .use(express.urlencoded())
    .use(express.session({
      secret: secret, 
      key: 'sid', 
+     store: new CasStore(config),
      cookie: { 
        secure: true
      }
@@ -71,6 +76,14 @@ app.get('/', function(req, res) {
 });
 app.get('/test', function(req, res) {
   res.render('layout.jade');
+});
+app.get('/route', function(req, res) {
+  console.log(req.session);
+  req.session.test = 'Test';
+});
+app.get('/route2', function(req, res) {
+  console.log(req.session);
+  req.session.test = 'Test2';
 });
 app.post('/login', 
   passport.authenticate('local', { successRedirect: '/',
