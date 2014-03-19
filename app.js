@@ -37,6 +37,12 @@ var secret = require('./keyfile.js');
 var express = require('express');
 var app = express();
 
+/* HSTS */
+app.use(function (req, res, next) {
+  res.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  return next();
+});
+
 /* Static file serving */
 app.use(express.compress())
    .use(express.static(__dirname + '/public'));
