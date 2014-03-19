@@ -2,3 +2,9 @@
 node_modules
 keyfile.js
 *.swp
+
+# HTTPS
+server.key
+server.csr
+server.crt
+pem_key

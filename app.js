@@ -14,6 +14,22 @@
  * =============================================================================
  */
 
+/* File system */
+var fs = require('fs');
+
+/* HTTPS */
+var https = require('https');
+
+/* SSL files */
+var privateKey = fs.readFileSync('server.key', 'utf8');
+var certificate = fs.readFileSync('server.crt', 'utf8');
+var pem_key = fs.readFileSync('pem_key', 'utf8');
+var credentials = { 
+  key: privateKey, 
+  cert: certificate,
+  passphrase: pem_key
+};
+
 /* Secret key to be used later */
 var secret = require('./keyfile.js');
 
@@ -25,7 +41,7 @@ var app = express();
 app.use(express.compress())
    .use(express.static(__dirname + '/public'));
 
-/* Sessions */
+/* DB and sessions */
 var CasStore = require('connect-cassandra-cql')(express),
     CasClient = require('node-cassandra-cql').Client;
 var client = new CasClient({ hosts: ['localhost'], keyspace: 'blabrr' });
@@ -36,17 +52,19 @@ app.use(express.cookieParser())
    .use(express.session({
      secret: secret, 
      key: 'sid', 
+     cookie: {
+       secure: true
+     },
      store: new CasStore(config)
    }));
 
 /* Passport */
-
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
-
 passport.use(new LocalStrategy(
   function(username, password, done) {
-    User.findOne( { username: username }, function (err, user) {
+    var query = 'SELECT * FROM users WHERE username=?';
+    client.executeAsPrepared(query, username, function (err, user) {
       if (err) { 
         return done(err); 
       }
@@ -95,4 +113,7 @@ app.post('/login',
                                    failureRedirect: '/login',
                                    failureFlash: true }));
 
-app.listen(1337);
+/* Create HTTPS server with Express object */
+var httpsServer = https.createServer(credentials, app);
+
+httpsServer.listen(1337);
