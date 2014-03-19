@@ -11,6 +11,7 @@ Glenna Yu
 ##### Jennie edit: 3/5/14 @ 12:06 AM
 ##### Yay - Glenna
 ##### Jeffrey Was Here
+##### Late to the party but whatevs...Big Dawg was here
 
 ## Module installation
 The `node_modules` directory has not been committed. To install dependencies, simply run `npm install`. We ensure that all modules and submodules have interoperable versions using `npm-shrinkwrap.json`. To learn more about this system, [read this short article.](http://blog.nodejs.org/2012/02/27/managing-node-js-dependencies-with-shrinkwrap/)
