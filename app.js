@@ -17,7 +17,8 @@
 /* File system */
 var fs = require('fs');
 
-/* HTTPS */
+/* HTTP and HTTPS */
+var http = require('http');
 var https = require('https');
 
 /* SSL files */
@@ -37,6 +38,21 @@ var secret = require('./keyfile.js');
 var express = require('express');
 var app = express();
 
+/* Our VPS is behind a reverse proxy */
+app.enable('trust proxy');
+
+/* Redirect HTTP to HTTPS */
+app.use(function (req, res, next) {
+  if (req.protocol === 'https') {
+    next();
+  }
+  else {
+    // Hardcoded port conversion, remove for live deployment
+    var new_url = 'https://' + req.headers.host.slice(0, -5) + ':8443' + req.url;
+    res.redirect(new_url);
+  }
+});
+
 /* HSTS */
 app.use(function (req, res, next) {
   res.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
@@ -49,7 +65,8 @@ app.use(express.compress())
 
 /* DB and sessions */
 var CasStore = require('connect-cassandra-cql')(express),
-    CasClient = require('node-cassandra-cql').Client;
+    cql = require('node-cassandra-cql'),
+    CasClient = cql.Client;
 var client = new CasClient({ hosts: ['localhost'], keyspace: 'blabrr' });
 var config = { client: client };
 app.use(express.cookieParser())
@@ -84,7 +101,6 @@ passport.use(new LocalStrategy(
     });
   }
 ));
-
 app.use(passport.initialize())
    .use(passport.session());
 
@@ -113,13 +129,24 @@ app.get('/route2', function(req, res) {
   res.end();
   console.log(req.session);
 });
-
 app.post('/login', 
   passport.authenticate('local', { successRedirect: '/',
                                    failureRedirect: '/login',
                                    failureFlash: true }));
+app.post('/signup', function(req, res) {
+  var query = 'INSERT INTO users (username, password) values (?, ?)';
+  client.executeAsPrepared(query, [req.body.username, req.body.password],
+                            cql.types.consistencies.one, function (err) {
+    if (err) {
+      // Do something better here
+      console.log(err);
+    }
+  });
+  res.send('Signed up!');
+});
 
-/* Create HTTPS server with Express object */
+/* Create HTTP and HTTPS servers with Express object */
+var httpServer = http.createServer(app);
 var httpsServer = https.createServer(credentials, app);
-
-httpsServer.listen(1337);
+httpServer.listen(8080);
+httpsServer.listen(8443);

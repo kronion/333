@@ -23,3 +23,4 @@ The `node_modules` directory has not been committed. To install dependencies, si
 * (3/19) HSTS effectiveness has not been verified. It seems it only works for ports 80 and 443, so we must deploy in order to test.
 * (3/19) HTTP requests are not redirected to HTTPS.
 * (3/19) Flash messages are not enabled.
+* (3/19) Hash passwords serverside
