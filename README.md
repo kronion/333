@@ -21,6 +21,7 @@ The `node_modules` directory has not been committed. To install dependencies, si
 
 ## Known issues
 * (3/19) HSTS effectiveness has not been verified. It seems it only works for ports 80 and 443, so we must deploy in order to test.
-* (3/19) HTTP requests are not redirected to HTTPS.
 * (3/19) Flash messages are not enabled.
 * (3/19) Hash passwords serverside
+* (3/20) No check to ensure that DB 'SELECT' returns a single row. We should probably check even if we believe this is ensured. Could eventual consistency issues allow two users to create colliding accounts?
+* (3/21) Need to make a simple 'login' view for failed logins from home screen (a la FB)

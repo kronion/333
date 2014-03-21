@@ -59,10 +59,6 @@ app.use(function (req, res, next) {
   return next();
 });
 
-/* Static file serving */
-app.use(express.compress())
-   .use(express.static(__dirname + '/public'));
-
 /* DB and sessions */
 var CasStore = require('connect-cassandra-cql')(express),
     cql = require('node-cassandra-cql'),
@@ -81,26 +77,44 @@ app.use(express.cookieParser())
      store: new CasStore(config)
    }));
 
+/* Flash messages */
+var flash = require('connect-flash');
+app.use(flash());
+
+/* Static file serving */
+app.use(express.compress())
+   .use(express.static(__dirname + '/public'));
+
 /* Passport */
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 passport.use(new LocalStrategy(
   function(username, password, done) {
     var query = 'SELECT * FROM users WHERE username=?';
-    client.executeAsPrepared(query, username, function (err, user) {
+    client.executeAsPrepared(query, [username], cql.types.consistencies.one, function (err, user) {
       if (err) { 
         return done(err); 
       }
-      if (!user) {
-        return done(null, false, { message: 'Incorrect username or password.' });
+      if (!user.rows[0]) {
+        return done(null, false, { 'message': 'Incorrect username.' }); 
       }
-      if (user.password != password) {
-        return done(null, false, { message: 'Incorrect password or password.' });
+      if (user.rows[0].password != password) {
+        return done(null, false, { 'message': 'Incorrect password.' });
       }
-      return done(null, user);
+      return done(null, user.rows[0]);
     });
   }
 ));
+passport.serializeUser(function(user, done) {
+  // Create user ID somehow
+  done(null, user.username);
+});
+passport.deserializeUser(function(id, done) {
+  var query = 'SELECT * FROM users WHERE username=?';
+  client.executeAsPrepared(query, [id], cql.types.consistencies.one, function (err, user) {
+    done(err, user.rows[0]);
+  });
+});
 app.use(passport.initialize())
    .use(passport.session());
 
@@ -110,29 +124,33 @@ app.set('view engine', 'jade');
 
 /* Routing */
 app.get('/', function(req, res) {
-  res.send('Hello World!');
+  if (req.user) {
+    res.render('home.jade');
+  }
+  else {
+    res.render('front.jade');
+  }
+});
+app.get('/user', function(req, res) {
+  res.send('Hello, ' + req.user.username + '!');
+  console.log(req.user);
+  console.log(req.session);
 });
 app.get('/test', function(req, res) {
-  res.render('layout.jade');
+  res.render('home.jade');
 });
-app.get('/route', function(req, res) {
-  console.log(req.session);
-  res.write('Response: ' + req.session.test);
-  req.session.test = 'Test';
-  res.end();
-  console.log(req.session);
-});
-app.get('/route2', function(req, res) {
-  console.log(req.session);
-  res.write('Response: ' + req.session.test);
-  req.session.test = 'Test2';
-  res.end();
-  console.log(req.session);
+app.get('/login', function(req, res) {
+  // MAKE THIS A NEW PAGE
+  res.render('front.jade', { flash: req.flash('error') });
 });
 app.post('/login', 
   passport.authenticate('local', { successRedirect: '/',
                                    failureRedirect: '/login',
                                    failureFlash: true }));
+app.get('/logout', function(req, res) {
+  req.logout();
+  res.redirect('/');
+});
 app.post('/signup', function(req, res) {
   var query = 'INSERT INTO users (username, password) values (?, ?)';
   client.executeAsPrepared(query, [req.body.username, req.body.password],
@@ -141,8 +159,10 @@ app.post('/signup', function(req, res) {
       // Do something better here
       console.log(err);
     }
+    else {
+      res.redirect('/');
+    }
   });
-  res.send('Signed up!');
 });
 
 /* Create HTTP and HTTPS servers with Express object */

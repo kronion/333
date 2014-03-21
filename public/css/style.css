@@ -1,0 +1,26 @@
+/* CSS reset */
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+.banner {
+  display: block;
+  width: 100%;
+  height:50px;
+
+  color: white;
+  background-color: black;
+}
+
+.banner > h1 {
+  margin: 0;
+}
+
+.right {
+  float: right;
+}
+
+.left {
+  float: left;
+}

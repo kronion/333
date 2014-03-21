@@ -367,6 +367,10 @@
           "resolved": "https://registry.npmjs.org/node-uuid/-/node-uuid-1.4.0.tgz"
         }
       }
+    },
+    "connect-flash": {
+      "version": "0.1.1",
+      "from": "connect-flash@"
     }
   }
 }
