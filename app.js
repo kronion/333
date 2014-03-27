@@ -121,6 +121,10 @@ app.use(passport.initialize())
 /* Jade templating */
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
+app.locals({
+  title: 'Blabrr',
+  flash: {}
+})
 
 /* Routing */
 app.get('/', function(req, res) {
@@ -141,7 +145,7 @@ app.get('/test', function(req, res) {
 });
 app.get('/login', function(req, res) {
   // MAKE THIS A NEW PAGE
-  res.render('front.jade', { flash: req.flash('error') });
+  res.render('front.jade', { flash: req.flash() });
 });
 app.post('/login', 
   passport.authenticate('local', { successRedirect: '/',
