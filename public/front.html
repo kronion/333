@@ -5,6 +5,14 @@
     <link rel='stylesheet' type='text/css' href='css/style.css'>
     <script src="js/jquery-1.10.2.min.js"></script>
     <title>NAME OF SITE</title>
+
+    <!-- Loading Bootstrap -->
+    <link href="flat/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Loading Flat UI -->
+    <link href="flat/css/flat-ui.css" rel="stylesheet">
+    <link href="flat/css/demo.css" rel="stylesheet">
+
   </head>
 
   <body background="princeton.jpg" background-position:50% 50%>
@@ -15,16 +23,16 @@
         <div class="popup">
             <a href="#" class="close" style="float:right;">X</a>
             <form style="text-align:center;">
-                <h1> Log In </h1>
+                <h2> Log In </h2>
                 <P>
                   <span class="title"></span> 
-                  <input name="username" type="text" placeholder='username' autofocus=true required=true/>
+                  <input name="username" type="text" placeholder='username' autofocus=true required=true/ class="form-control">
                 </P>
                 <P>
                   <span class="title"></span> 
-                  <input name="password" placeholder="password" required=true type="password" /></P>
+                  <input name="password" placeholder="password" required=true type="password" class="form-control"/></P>
                 <P>
-                  <input name="" type="button" value="Login" />
+                  <input name="" type="button" value="Login" class="btn btn-block btn-lg btn-warning" />
                 </P>
             </form>
         </div>
@@ -43,14 +51,24 @@
 
       <div class="rightside">
         <div class="signup">
-          <h2>Sign Up Here!</h2> <br>
+          <h3>Sign Up Here!</h3>
 
             <form action='/signup' method='post'>
-              <input type='text' name='firstname' placeholder='First Name' required=true>
-              <input type='text' name='lastname' placeholder='Last Name' required=true> <br>
-              <input type='text' name='email' placeholder='Email Address' required=true> <br>
-              <input type='password' name='password' placeholder='password' required=true> <br>
-              <input type='submit' value='Submit'>
+              <p>
+                <input type='text' name='firstname' placeholder='First Name' required=true class="form-control">
+              </p>
+              <p>
+                <input type='text' name='lastname' placeholder='Last Name' required=true class="form-control">
+              </p>
+              <p>
+                <input type='text' name='email' placeholder='Email Address' required=true class="form-control">
+              </p>
+              <p>
+                <input type='password' name='password' placeholder='password' required=true class="form-control">
+              </p>
+              <p>
+                <a href="#fakelink" class="btn btn-block btn-lg btn-primary">Submit</a>
+              </p>
             </form>
             
         </div>
