@@ -1,9 +1,21 @@
-/*----------------------------------------------------------------------------*/
-/* CSS reset */
+/*-----------------------------------------------------------------------------*
+/* CSS reset                                                                  */
 /*----------------------------------------------------------------------------*/
 html, body {
   margin: 0;
   padding: 0;
+}
+
+hr {
+  height: 1px;
+
+  border: none;
+
+  background-color: #bbb;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 0;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -17,41 +29,33 @@ html, body {
   float: left;
 }
 
-/*----------------------------------------------------------------------------*/
-/* Flash messages */
-/*----------------------------------------------------------------------------*/
-.flash {
-  position: fixed;
-  display: inline-block;
+.padded {
+  margin: 20px;
+}
 
+.relative: {
+  position: relative;
+}
+
+.full {
+  height: 100%;
   width: 100%;
-
-  border: 1px solid #ee5fad;
 }
 
-.flash-inner {
-  height:50px;
-  line-height:50px;
-  vertical-align:middle;
-
-  padding: 0 10px;
+.rounded {
+  border-radius: 5px;
 }
 
-.flash-inner h5 {
-  margin: 0;
-}
-
-.flash-spacing {
-  height: 50px;
-}
-
+/*----------------------------------------------------------------------------*/
+/* Flash messages                                                             */
+/*----------------------------------------------------------------------------*/
 .error {
-  background-color: #ee7f2d;
-  color: black;
-}
+  margin-top: 0.60em;
 
-.close {
-  cursor: pointer;
+  border: 1px solid #e9322d;
+
+  background-color: #f5b8b2;
+  color: black;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -60,13 +64,62 @@ html, body {
 .banner {
   display: block;
 
-  width: 100%;
-  height:50px;
+  height:75px;
 
   color: white;
   background-color: black;
 }
 
-.banner > h1 {
+.banner-inner {
+  position: relative;
+
+  height: 100%;
+
+  margin-left: 175px;
+  margin-right: 175px;
+}
+
+.banner-inner h1 {
+  position: absolute;
+
+  bottom: 0px;
+
   margin: 0;
+}
+
+/*----------------------------------------------------------------------------*/
+/* Login form                                                                 */
+/*----------------------------------------------------------------------------*/
+.content {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+
+  min-width: 550px;
+  max-width: 800px;
+}
+
+.bounding-box {
+  width: 100%;
+
+  margin-top: 80px;
+
+  border: solid 1px #bbb;
+
+  background-color: #f4f4f4;
+}
+
+.button-align {
+  width: 230px;
+  text-align: center;
+}
+
+.button-align > p {
+  margin: 0;
+  display: inline;
+  line-height: 34px;
+}
+
+.button-align > button, input {
+  display: inline;
 }

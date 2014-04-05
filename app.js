@@ -96,10 +96,12 @@ passport.use(new LocalStrategy(
         return done(err); 
       }
       if (!user.rows[0]) {
-        return done(null, false, { 'message': 'Incorrect username.' }); 
+        return done(null, false, { 'message': 
+          '{ "title": "Incorrect username", "parts": ["We couldn\'t find any user with the username you provided.", "Please try a different username and try again, or sign up."] }'}); 
       }
       if (user.rows[0].password != password) {
-        return done(null, false, { 'message': 'Incorrect password.' });
+        return done(null, false, { 'message': 
+          '{ "title": "Incorrect password", "parts": ["The provided username and password didn\'t match anyone in our records.", "Please check your spelling and try again."] }' });
       }
       return done(null, user.rows[0]);
     });
@@ -135,17 +137,15 @@ app.get('/', function(req, res) {
     res.render('front.jade');
   }
 });
-app.get('/user', function(req, res) {
-  res.send('Hello, ' + req.user.username + '!');
-  console.log(req.user);
-  console.log(req.session);
-});
-app.get('/test', function(req, res) {
-  res.render('home.jade');
-});
 app.get('/login', function(req, res) {
-  // MAKE THIS A NEW PAGE
-  res.render('front.jade', { flash: req.flash() });
+  var errors = req.flash();
+  var results = [];
+  if (errors.error) {
+    for (var i = 0; i < errors.error.length; i++) {
+      results.push(JSON.parse(errors.error[i]));
+    }
+  }
+  res.render('login.jade', { flash: results });
 });
 app.post('/login', 
   passport.authenticate('local', { successRedirect: '/',
