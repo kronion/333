@@ -4,7 +4,7 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0' />
     <link rel='stylesheet' type='text/css' href='css/style.css'>
     <script src="js/jquery-1.10.2.min.js"></script>
-    <title>NAME OF SITE</title>
+    <title>Blabrr</title>
 
     <!-- Loading Bootstrap -->
     <link href="flat/bootstrap/css/bootstrap.css" rel="stylesheet">
@@ -15,7 +15,7 @@
 
   </head>
 
-  <body background="princeton.jpg" background-position:50% 50%>
+  <body>
 
     <div class="overlay"></div>
     <div class="ar login_popup">
@@ -24,16 +24,18 @@
             <a href="#" class="close" style="float:right;">X</a>
             <form style="text-align:center;">
                 <h2> Log In </h2>
-                <P>
-                  <span class="title"></span> 
-                  <input name="username" type="text" placeholder='username' autofocus=true required=true/ class="form-control">
-                </P>
-                <P>
-                  <span class="title"></span> 
-                  <input name="password" placeholder="password" required=true type="password" class="form-control"/></P>
-                <P>
-                  <input name="" type="button" value="Login" class="btn btn-block btn-lg btn-warning" />
-                </P>
+                <form action='/login' method='post>'
+                  <P>
+                    <span class="title"></span> 
+                    <input name="username" type="text" placeholder='username' autofocus=true required=true/ class="form-control">
+                  </P>
+                  <P>
+                    <span class="title"></span> 
+                    <input name="password" placeholder="password" required=true type="password" class="form-control"/></P>
+                  <P>
+                    <input name="" type="button" value="Login" class="btn btn-block btn-lg btn-warning" />
+                  </P>
+                </form>
             </form>
         </div>
     </div>

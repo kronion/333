@@ -12,7 +12,7 @@ html, body {
   height: 100%;
 
   overflow: auto;
-  background-position: center;
+  background-color: #EDF7F6; /* off white */
   color: black;
 }
 
@@ -68,8 +68,7 @@ html, body {
 /* Middle Info                                                                */
 /*----------------------------------------------------------------------------*/
 .info {
-  border-radius: 7px;
-  background-color: #804FB0;
+  background-color: black;
   height: 400px;
   width: 800px;
 
@@ -80,7 +79,7 @@ html, body {
   margin-left: -400px;
 
   overflow:auto;
-  color: black;
+  color: white;
 }
 
 .leftside {
@@ -109,13 +108,12 @@ html, body {
 /*----------------------------------------------------------------------------*/
 .button {
   display: inline-block;
-  border-radius: 7px;
 
   margin-top: 5px;
   margin-left: 5px;
   margin-right: 5px;
 
-  background: #804FB0;
+  background: black;
   padding: 5px 10px;
   z-index: 0;
   color: #fff;
@@ -132,9 +130,8 @@ html, body {
 }
  
 .popup {
-  border-radius: 7px;
   padding: 10px 10px 35px;
-  background: #CDADED;
+  background: #EDF7F6; /* off white */
   color: black;
   z-index: 2;
   display: none;
@@ -146,6 +143,20 @@ html, body {
   height:300;
   margin-left: -150px;
   margin-top: -150px;
+}
+
+.quickadd {
+  float: center;
+  padding: 10px 10px 35px;
+  background: gray;
+  color: black;
+
+  top: 50%;
+  left: 50%;
+  width: 300;
+  height: 160;
+  margin-left: -150 px;
+  margin-top: 0px;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -160,7 +171,7 @@ html, body {
   padding: 10px 10px 10px;
 
   color: white;
-  background-color: #804FB0;
+  background-color: black;
 }
 
 .banner-center {
@@ -181,4 +192,47 @@ nav li {
   color: white;
 }
 
+/*----------------------------------------------------------------------------*/
+/* Searchbar                                                                  */
+/*----------------------------------------------------------------------------*/
+.search {
+  float: center;
+}
+#tfnewsearch{
+  padding:20px;
+}
 
+.tftextinput{
+  margin: 0;
+  padding: 5px 10px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size:14px;
+  border:1px solid #0076a3; border-right:0px;
+  color: black;
+}
+
+.tfbutton {
+  margin: 0;
+  padding: 5px 15px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size:14px;
+  cursor: pointer;
+  text-align: center;
+  color: #ffffff;
+  border-right:0px;
+  background: red;
+}
+
+.tfbutton:hover {
+  text-decoration: none;
+  background: green;
+}
+
+/* Fixes submit button height problem in Firefox */
+.tfbutton::-moz-focus-inner {
+  border: 0;
+}
+
+.tfclear{
+  clear: both;
+}
