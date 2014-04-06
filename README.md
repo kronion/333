@@ -25,4 +25,4 @@ The `node_modules` directory has not been committed. To install dependencies, si
 * (3/20) No check to ensure that DB 'SELECT' returns a single row. We should probably check even if we believe this is ensured. Could eventual consistency issues allow two users to create colliding accounts?
   * Use QUORUM, must set this up
   * Add check to make sure username doesn't already exist
-* (3/21) Need to make a simple 'login' view for failed logins from home screen (a la FB)
+* (4/5) Gruntfile is broken?

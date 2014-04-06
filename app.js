@@ -34,6 +34,9 @@ var credentials = {
 /* Secret key to be used later */
 var secret = require('./keyfile.js');
 
+/* Strings */
+var strings = require('./strings.js');
+
 /* Express */
 var express = require('express');
 var app = express();
@@ -96,12 +99,10 @@ passport.use(new LocalStrategy(
         return done(err); 
       }
       if (!user.rows[0]) {
-        return done(null, false, { 'message': 
-          '{ "title": "Incorrect username", "parts": ["We couldn\'t find any user with the username you provided.", "Please try a different username and try again, or sign up."] }'}); 
+        return done(null, false, { 'message': strings.incorrect_username }); 
       }
       if (user.rows[0].password != password) {
-        return done(null, false, { 'message': 
-          '{ "title": "Incorrect password", "parts": ["The provided username and password didn\'t match anyone in our records.", "Please check your spelling and try again."] }' });
+        return done(null, false, { 'message': strings.incorrect_password });
       }
       return done(null, user.rows[0]);
     });
