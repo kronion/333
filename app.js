@@ -95,7 +95,8 @@ var LocalStrategy = require('passport-local').Strategy;
 passport.use(new LocalStrategy(
   function(username, password, done) {
     var query = 'SELECT * FROM users WHERE username=?';
-    client.executeAsPrepared(query, [username], cql.types.consistencies.one, function (err, user) {
+    client.executeAsPrepared(query, [username], cql.types.consistencies.one, 
+                             function (err, user) {
       if (err) { 
         return done(err); 
       }
@@ -173,13 +174,25 @@ app.post('/', function(req, res) {
   }
 
   if (req.body.addLink) {
-    var query2 = 'INSERT INTO userlinks (url, username) VALUES (?, ?)';
-    client.execute(query2, [req.body.addLink, req.user.username],
+    var query2 = 'INSERT INTO userlinks (username, url) VALUES (?, ?)';
+    client.execute(query2, [req.user.username, req.body.addLink],
                           cql.types.consistencies.one, function (err) {
       if (err) {console.log(err);}
       else {res.redirect('/');}
     });
   }
+});
+app.get('/pages/:name', function(req, res) {
+  var query = 'SELECT * FROM userlinks WHERE username=?';
+  client.executeAsPrepared(query, [req.params.name], 
+                           cql.types.consistencies.one, function (err, links) {
+    if (err) {
+      res.send('Error occurred: ' + err);
+    }
+    else {
+      res.render('profile.jade', { links: links.rows });
+    }
+  });
 });
 app.get('/login', function(req, res) {
   var errors = req.flash();
