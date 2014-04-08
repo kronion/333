@@ -12,7 +12,7 @@ module.exports = function(grunt) {
         tasks: ['jshint']
       },
       modules: {
-        files: ['node_modules/*/README*', 'node_modules/*/Readme*'],
+        files: ['node_modules/**/README*'], //'node_modules/*/Readme*'],
         tasks: ['shrinkwrap']
       }
     }

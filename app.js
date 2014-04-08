@@ -6,10 +6,10 @@
  *   Description:   Root server file, acts as the point of connection between
  *                  client and routing logic.
  *
- *      Version:    0.0.1
- *      Created:    3/5/14 3:31:18 AM
+ *       Version:   0.0.1
+ *       Created:   3/5/14 3:31:18 AM
  *
- *       Author:    Collin Stedman
+ *        Author:   Collin Stedman
  *
  * =============================================================================
  */
@@ -34,6 +34,9 @@ var credentials = {
 
 /* Secret key to be used later */
 var secret = require('./keyfile.js');
+
+/* Strings */
+var strings = require('./strings.js');
 
 /* Express */
 var express = require('express');
@@ -92,15 +95,16 @@ var LocalStrategy = require('passport-local').Strategy;
 passport.use(new LocalStrategy(
   function(username, password, done) {
     var query = 'SELECT * FROM users WHERE username=?';
-    client.executeAsPrepared(query, [username], cql.types.consistencies.one, function (err, user) {
+    client.executeAsPrepared(query, [username], cql.types.consistencies.one, 
+                             function (err, user) {
       if (err) { 
         return done(err); 
       }
       if (!user.rows[0]) {
-        return done(null, false, { 'message': 'Incorrect username.' }); 
+        return done(null, false, { 'message': strings.incorrect_username }); 
       }
       if (user.rows[0].password != password) {
-        return done(null, false, { 'message': 'Incorrect password.' });
+        return done(null, false, { 'message': strings.incorrect_password });
       }
       return done(null, user.rows[0]);
     });
@@ -136,7 +140,6 @@ app.get('/', function(req, res) {
     res.render('front.jade');
   }
 });
-
 app.post('/', function(req, res) {
   if(req.body.addFollower) {
     var query = 'UPDATE users SET followers = followers + {?} WHERE username=?';
@@ -171,26 +174,35 @@ app.post('/', function(req, res) {
   }
 
   if (req.body.addLink) {
-    var query2 = 'INSERT INTO userlinks (url, username) VALUES (?, ?)';
-    client.execute(query2, [req.body.addLink, req.user.username],
+    var query2 = 'INSERT INTO userlinks (username, url) VALUES (?, ?)';
+    client.execute(query2, [req.user.username, req.body.addLink],
                           cql.types.consistencies.one, function (err) {
       if (err) {console.log(err);}
       else {res.redirect('/');}
     });
   }
 });
-
-app.get('/user', function(req, res) {
-  res.send('Hello, ' + req.user.username + '!');
-  console.log(req.user);
-  console.log(req.session);
-});
-app.get('/test', function(req, res) {
-  res.render('home.jade');
+app.get('/pages/:name', function(req, res) {
+  var query = 'SELECT * FROM userlinks WHERE username=?';
+  client.executeAsPrepared(query, [req.params.name], 
+                           cql.types.consistencies.one, function (err, links) {
+    if (err) {
+      res.send('Error occurred: ' + err);
+    }
+    else {
+      res.render('profile.jade', { links: links.rows });
+    }
+  });
 });
 app.get('/login', function(req, res) {
-  // MAKE THIS A NEW PAGE
-  res.render('front.jade', { flash: req.flash() });
+  var errors = req.flash();
+  var results = [];
+  if (errors.error) {
+    for (var i = 0; i < errors.error.length; i++) {
+      results.push(JSON.parse(errors.error[i]));
+    }
+  }
+  res.render('login.jade', { flash: results });
 });
 app.post('/login', 
   passport.authenticate('local', { successRedirect: '/',
