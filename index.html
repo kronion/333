@@ -64,6 +64,85 @@ Glenna Yu  </p>
 <a name="cassandra-setup" class="anchor" href="#cassandra-setup"><span class="octicon octicon-link"></span></a>Cassandra setup</h2>
 
 <p>COMING SOON!</p>
+
+
+<h2><a name="3-19-14" class="anchor" href="#3-19-14"><span class="octicon octicon-link"></span></a>March 19</h2>
+<p>
+  <ul>
+    <li>HSTS effectiveness has not been verified. It seems it only works for ports 80 and 443, so we must deploy in order to test.</li>
+    <li>Hash passwords serverside.</li>
+  </ul>
+</p>
+
+<h2><a name="3-20-14" class="anchor" href="#3-20-14"><span class="octicon octicon-link"></span></a>March 20</h2>
+<p>
+  <ul>
+    <li>No check to ensure that DB 'SELECT' returns a single row. We should probably check even if we believe this is ensured. Could eventual consistenc issues allow two users to create colliding accounts?</li>
+    <li>Use QUORUM, must set this up.</li>
+    <li>Add check to make sure username doesn't already exist</li>
+    <li>Gruntfile is broken?</li>
+  </ul>
+</p>
+
+<h2><a name="3-28-14-Meeting" class="anchor" href="#3-28-14-Meeting"><span class="octicon octicon-link"></span></a>March 28th Meeting</h2>
+
+<p>
+<ul>
+  <li> Were brought up to speed on what Collin had set up over break (database setup, server, etc.)</li>
+  <li> Divided up tasks for the next few weeks:
+    <ul>
+      <li>User Interface: Jennie</li>
+      <li>Database Collection: Glenna</li>
+      <li>Middleware: Erik and Jeffery</li>
+    </ul>
+  <li> Discussed necessary design decisions:
+    <ul>
+      <li> Friends vs. followers and the addition of mutual followers with commenting power</li>
+      <li> Possibility of Chrome extensions</li>
+      <li> Connecting with Facebook </li>
+      <li> HTTPS support through Princetton? Need to research </li>
+    </ul>
+  </li>
+</ul>
+</p>
+
+<h2><a name="4-4-14-Meeting" class="anchor" href="#4-4-14-Meeting"><span class="octicon octicon-link"></span></a>April 4th Meeting</h2>
+
+<p>
+<ul>
+  <li>In the past week, we have:
+    <ul>
+      <li>Made a passable homepage and login page
+        <ul>
+          <li>Color and style can be determined later</li>
+          <li>Uses Flat UI (and by extension Bootstrap), which makes everything look more modern</li>
+        </ul>
+      </li>
+      <li>Added routes for posting links/media
+        <ul>
+          <li>We haven't gotten to the point where you can see what you've saved (for MVP, but hopefully we'll have this by next week)</li>
+        </ul>
+      </li>
+      <li>Collected data (with tags) to test our newsfeed operations</li>
+    </ul>
+  </li>
+  <li>Discussed our push notification system (asked in class about Facebook's algorithm for newsfeeds) and how we want to implement our own newsfeed</li>
+  <li>Continued discussion about database schema and who we coudl contact about it (best practices for Cassandra, etc.)
+    <ul>
+      <li>Taewook advised we contact <span style="color:red">Andrea LaPaugh</span> (aslp@) for advice</li>
+    </ul>
+  </li>
+  <li>Goals for next week:
+    <ul>
+      <li>Have basic functionality of the website working</li>
+      <li>Start work on recommendations (not part of MVP)</li>
+      <li>Facebook integration (for logins, friends, general API)</li>
+      <li>Chrome extension/bookmarklet (all browsers)</li>
+      <li>NAME!</li>
+    </ul>
+  </li>
+</ul>
+</p>
       </section>
 
     </div>
