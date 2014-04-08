@@ -142,12 +142,12 @@ app.get('/', function(req, res) {
 });
 app.post('/', function(req, res) {
   if(req.body.addFollower) {
-    var query = 'UPDATE users SET followers = followers + {?} WHERE username=?';
+    var query = 'UPDATE users SET followers = followers + {?} WHERE userid=?';
     var params = [req.body.addFollower, req.user.username];
     client.execute(query, params, cql.types.consistencies.one, function (err) {
       if(err) {console.log(err);}
       else {
-        query = 'UPDATE users SET followees = followees + {?} WHERE username=?';
+        query = 'UPDATE users SET followees = followees + {?} WHERE userid=?';
         params = [req.user.username, req.body.addFollower];
         client.execute(query, params, cql.types.consistencies.one, function(err) {
           if(err) {console.log(err);}
@@ -158,12 +158,12 @@ app.post('/', function(req, res) {
   }
 
   if(req.body.removeFollower) {
-    var query1 = 'UPDATE users SET followers = followers - {?} WHERE username=?';
+    var query1 = 'UPDATE users SET followers = followers - {?} WHERE userid=?';
     var params1 = [req.body.removeFollower, req.user.username];
     client.execute(query1, params1, cql.types.consistencies.one, function (err) {
       if(err) {console.log(err);}
       else {
-        query1 = 'UPDATE users SET followees = followees - {?} WHERE username=?';
+        query1 = 'UPDATE users SET followees = followees - {?} WHERE userid=?';
         params1 = [req.user.username, req.body.removeFollower];
         client.execute(query1, params1, cql.types.consistencies.one, function(err) {
           if(err) {console.log(err);}
@@ -174,7 +174,7 @@ app.post('/', function(req, res) {
   }
 
   if (req.body.addLink) {
-    var query2 = 'INSERT INTO userlinks (username, url) VALUES (?, ?)';
+    var query2 = 'INSERT INTO user_links (userid, linkid) VALUES (?, ?)';
     client.execute(query2, [req.user.username, req.body.addLink],
                           cql.types.consistencies.one, function (err) {
       if (err) {console.log(err);}
@@ -183,7 +183,7 @@ app.post('/', function(req, res) {
   }
 });
 app.get('/pages/:name', function(req, res) {
-  var query = 'SELECT * FROM userlinks WHERE username=?';
+  var query = 'SELECT * FROM user_links WHERE userid=?';
   client.executeAsPrepared(query, [req.params.name], 
                            cql.types.consistencies.one, function (err, links) {
     if (err) {
