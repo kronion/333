@@ -16,6 +16,7 @@
 
 /* File system */
 var fs = require('fs');
+var path = require('path');
 
 /* HTTP and HTTPS */
 var http = require('http');
@@ -119,12 +120,12 @@ app.use(passport.initialize())
    .use(passport.session());
 
 /* Jade templating */
-app.set('views', __dirname + '/views');
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.locals({
   title: 'Blabrr',
   flash: {}
-})
+});
 
 /* Routing */
 app.get('/', function(req, res) {
@@ -135,6 +136,50 @@ app.get('/', function(req, res) {
     res.render('front.jade');
   }
 });
+
+app.post('/', function(req, res) {
+  if(req.body.addFollower) {
+    var query = 'UPDATE users SET followers = followers + {?} WHERE username=?';
+    var params = [req.body.addFollower, req.user.username];
+    client.execute(query, params, cql.types.consistencies.one, function (err) {
+      if(err) {console.log(err);}
+      else {
+        query = 'UPDATE users SET followees = followees + {?} WHERE username=?';
+        params = [req.user.username, req.body.addFollower];
+        client.execute(query, params, cql.types.consistencies.one, function(err) {
+          if(err) {console.log(err);}
+        });
+        res.redirect('/');
+      }
+    });
+  }
+
+  if(req.body.removeFollower) {
+    var query1 = 'UPDATE users SET followers = followers - {?} WHERE username=?';
+    var params1 = [req.body.removeFollower, req.user.username];
+    client.execute(query1, params1, cql.types.consistencies.one, function (err) {
+      if(err) {console.log(err);}
+      else {
+        query1 = 'UPDATE users SET followees = followees - {?} WHERE username=?';
+        params1 = [req.user.username, req.body.removeFollower];
+        client.execute(query1, params1, cql.types.consistencies.one, function(err) {
+          if(err) {console.log(err);}
+        });
+        res.redirect('/');
+      }
+    });
+  }
+
+  if (req.body.addLink) {
+    var query2 = 'INSERT INTO userlinks (url, username) VALUES (?, ?)';
+    client.execute(query2, [req.body.addLink, req.user.username],
+                          cql.types.consistencies.one, function (err) {
+      if (err) {console.log(err);}
+      else {res.redirect('/');}
+    });
+  }
+});
+
 app.get('/user', function(req, res) {
   res.send('Hello, ' + req.user.username + '!');
   console.log(req.user);
