@@ -34,6 +34,9 @@ var credentials = {
 /* Secret key to be used later */
 var secret = require('./keyfile.js');
 
+/* Strings */
+var strings = require('./strings.js');
+
 /* Express */
 var express = require('express');
 var app = express();
@@ -96,10 +99,10 @@ passport.use(new LocalStrategy(
         return done(err); 
       }
       if (!user.rows[0]) {
-        return done(null, false, { 'message': 'Incorrect username.' }); 
+        return done(null, false, { 'message': strings.incorrect_username }); 
       }
       if (user.rows[0].password != password) {
-        return done(null, false, { 'message': 'Incorrect password.' });
+        return done(null, false, { 'message': strings.incorrect_password });
       }
       return done(null, user.rows[0]);
     });
@@ -135,17 +138,15 @@ app.get('/', function(req, res) {
     res.render('front.jade');
   }
 });
-app.get('/user', function(req, res) {
-  res.send('Hello, ' + req.user.username + '!');
-  console.log(req.user);
-  console.log(req.session);
-});
-app.get('/test', function(req, res) {
-  res.render('home.jade');
-});
 app.get('/login', function(req, res) {
-  // MAKE THIS A NEW PAGE
-  res.render('front.jade', { flash: req.flash() });
+  var errors = req.flash();
+  var results = [];
+  if (errors.error) {
+    for (var i = 0; i < errors.error.length; i++) {
+      results.push(JSON.parse(errors.error[i]));
+    }
+  }
+  res.render('login.jade', { flash: results });
 });
 app.post('/login', 
   passport.authenticate('local', { successRedirect: '/',
