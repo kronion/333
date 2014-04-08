@@ -1,0 +1,45 @@
+doctype html
+html(lang='en')
+  head
+    meta(http-equiv='content-type' content='text/html' charset='utf-8')
+    meta(name='viewport' content='width=device-width')
+    link(rel='stylesheet' type='text/css' href='css/pure-min.css')
+    link(rel='stylesheet' type='text/css' href='css/style.css')
+    title=title
+  body
+    div.pure-g-r
+      div.pure-u-1-1.banner
+        div.banner-inner
+          h1.left Blabrr
+      div.pure-u-1-2.content
+        div.bounding-box.rounded
+          div.padded
+            h3 Log in to Blabrr
+            hr
+            div.pure-g-r
+              div.pure-u-11-24.relative
+                div.error.rounded
+                  div.padded
+                    if flash.length > 0
+                      each error in flash
+                        h4=error.title
+                        for part in error.parts
+                          p=part
+                    else
+                      h4 An error occurred
+                      asd
+                      p Sorry! It looks like we messed up. Unfortunately, that's all we know.
+                      p We'll dispatch the nerds right away. 
+              div.pure-u-1-12
+              form.pure-u-11-24.pure-form.pure-form-stacked(action='/login' method='post')
+                fieldset
+                  label(for='username') Username
+                  input(type='text' name='username' placeholder='username' autofocus=true required=true)
+                fieldset
+                  label(for='password') Password
+                  input(type='password' name='password' placeholder='password' required=true)
+                div.button-align
+                  input.pure-button.pure-button-primary.left(type='submit' value='Log in')
+                  p or
+                  button.pure-button.pure-button-primary.right(href='/signup') Sign up
+    include scripts
