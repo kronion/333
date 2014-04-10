@@ -2,6 +2,16 @@
   "name": "333_Project",
   "version": "0.0.1",
   "dependencies": {
+    "connect-cassandra-cql": {
+      "version": "0.1.2",
+      "from": "https://registry.npmjs.org/connect-cassandra-cql/-/connect-cassandra-cql-0.1.2.tgz",
+      "resolved": "https://registry.npmjs.org/connect-cassandra-cql/-/connect-cassandra-cql-0.1.2.tgz"
+    },
+    "connect-flash": {
+      "version": "0.1.1",
+      "from": "connect-flash@0.1.1",
+      "resolved": "https://registry.npmjs.org/connect-flash/-/connect-flash-0.1.1.tgz"
+    },
     "express": {
       "version": "3.4.8",
       "from": "express@3.4.8",
@@ -123,42 +133,6 @@
         "debug": {
           "version": "0.7.4",
           "from": "debug@>= 0.7.3 < 1"
-        }
-      }
-    },
-    "passport": {
-      "version": "0.2.0",
-      "from": "passport@0.2.0",
-      "resolved": "https://registry.npmjs.org/passport/-/passport-0.2.0.tgz",
-      "dependencies": {
-        "passport-strategy": {
-          "version": "1.0.0",
-          "from": "passport-strategy@1.x.x"
-        },
-        "pause": {
-          "version": "0.0.1",
-          "from": "pause@0.0.1"
-        }
-      }
-    },
-    "passport-local": {
-      "version": "0.1.6",
-      "from": "passport-local@0.1.6",
-      "resolved": "https://registry.npmjs.org/passport-local/-/passport-local-0.1.6.tgz",
-      "dependencies": {
-        "pkginfo": {
-          "version": "0.2.3",
-          "from": "pkginfo@0.2.x"
-        },
-        "passport": {
-          "version": "0.1.18",
-          "from": "passport@~0.1.1",
-          "dependencies": {
-            "pause": {
-              "version": "0.0.1",
-              "from": "pause@0.0.1"
-            }
-          }
         }
       }
     },
@@ -342,11 +316,6 @@
         }
       }
     },
-    "connect-cassandra-cql": {
-      "version": "0.1.2",
-      "from": "https://registry.npmjs.org/connect-cassandra-cql/-/connect-cassandra-cql-0.1.2.tgz",
-      "resolved": "https://registry.npmjs.org/connect-cassandra-cql/-/connect-cassandra-cql-0.1.2.tgz"
-    },
     "node-cassandra-cql": {
       "version": "0.4.4",
       "from": "node-cassandra-cql@",
@@ -368,9 +337,41 @@
         }
       }
     },
-    "connect-flash": {
-      "version": "0.1.1",
-      "from": "connect-flash@"
+    "passport": {
+      "version": "0.2.0",
+      "from": "passport@0.2.0",
+      "resolved": "https://registry.npmjs.org/passport/-/passport-0.2.0.tgz",
+      "dependencies": {
+        "passport-strategy": {
+          "version": "1.0.0",
+          "from": "passport-strategy@1.x.x"
+        },
+        "pause": {
+          "version": "0.0.1",
+          "from": "pause@0.0.1"
+        }
+      }
+    },
+    "passport-local": {
+      "version": "0.1.6",
+      "from": "passport-local@0.1.6",
+      "resolved": "https://registry.npmjs.org/passport-local/-/passport-local-0.1.6.tgz",
+      "dependencies": {
+        "pkginfo": {
+          "version": "0.2.3",
+          "from": "pkginfo@0.2.x"
+        },
+        "passport": {
+          "version": "0.1.18",
+          "from": "passport@~0.1.1",
+          "dependencies": {
+            "pause": {
+              "version": "0.0.1",
+              "from": "pause@0.0.1"
+            }
+          }
+        }
+      }
     }
   }
 }
