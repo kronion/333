@@ -6,10 +6,24 @@ module.exports = function(grunt) {
       options: {
       }
     },
+    less: {
+      production: {
+        options: {
+          cleancss: true
+        },
+        files: {
+          'public/css/style.css': 'less/style.less'
+        }
+      }
+    },
     watch: {
       scripts: {
         files: ['<%= jshint.files %>'],
         tasks: ['jshint']
+      },
+      style: {
+        files: ['less/style.less'],
+        tasks: ['less']
       },
       modules: {
         files: ['node_modules/**/README*'], //'node_modules/*/Readme*'],
@@ -43,5 +57,6 @@ module.exports = function(grunt) {
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-watch');
 };
