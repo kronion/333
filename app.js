@@ -6,16 +6,17 @@
  *   Description:   Root server file, acts as the point of connection between
  *                  client and routing logic.
  *
- *      Version:    0.0.1
- *      Created:    3/5/14 3:31:18 AM
+ *       Version:   0.0.1
+ *       Created:   3/5/14 3:31:18 AM
  *
- *       Author:    Collin Stedman
+ *        Author:   Collin Stedman
  *
  * =============================================================================
  */
 
 /* File system */
 var fs = require('fs');
+var path = require('path');
 
 /* HTTP and HTTPS */
 var http = require('http');
@@ -94,7 +95,8 @@ var LocalStrategy = require('passport-local').Strategy;
 passport.use(new LocalStrategy(
   function(username, password, done) {
     var query = 'SELECT * FROM users WHERE username=?';
-    client.executeAsPrepared(query, [username], cql.types.consistencies.one, function (err, user) {
+    client.executeAsPrepared(query, [username], cql.types.consistencies.one, 
+                             function (err, user) {
       if (err) { 
         return done(err); 
       }
@@ -122,12 +124,12 @@ app.use(passport.initialize())
    .use(passport.session());
 
 /* Jade templating */
-app.set('views', __dirname + '/views');
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.locals({
   title: 'Blabrr',
   flash: {}
-})
+});
 
 /* Routing */
 app.get('/', function(req, res) {
@@ -137,6 +139,60 @@ app.get('/', function(req, res) {
   else {
     res.render('front.jade');
   }
+});
+app.post('/', function(req, res) {
+  if(req.body.addFollower) {
+    var query = 'UPDATE users SET followers = followers + {?} WHERE username=?';
+    var params = [req.body.addFollower, req.user.username];
+    client.execute(query, params, cql.types.consistencies.one, function (err) {
+      if(err) {console.log(err);}
+      else {
+        query = 'UPDATE users SET followees = followees + {?} WHERE username=?';
+        params = [req.user.username, req.body.addFollower];
+        client.execute(query, params, cql.types.consistencies.one, function(err) {
+          if(err) {console.log(err);}
+        });
+        res.redirect('/');
+      }
+    });
+  }
+
+  if(req.body.removeFollower) {
+    var query1 = 'UPDATE users SET followers = followers - {?} WHERE username=?';
+    var params1 = [req.body.removeFollower, req.user.username];
+    client.execute(query1, params1, cql.types.consistencies.one, function (err) {
+      if(err) {console.log(err);}
+      else {
+        query1 = 'UPDATE users SET followees = followees - {?} WHERE username=?';
+        params1 = [req.user.username, req.body.removeFollower];
+        client.execute(query1, params1, cql.types.consistencies.one, function(err) {
+          if(err) {console.log(err);}
+        });
+        res.redirect('/');
+      }
+    });
+  }
+
+  if (req.body.addLink) {
+    var query2 = 'INSERT INTO userlinks (username, url) VALUES (?, ?)';
+    client.execute(query2, [req.user.username, req.body.addLink],
+                          cql.types.consistencies.one, function (err) {
+      if (err) {console.log(err);}
+      else {res.redirect('/');}
+    });
+  }
+});
+app.get('/pages/:name', function(req, res) {
+  var query = 'SELECT * FROM userlinks WHERE username=?';
+  client.executeAsPrepared(query, [req.params.name], 
+                           cql.types.consistencies.one, function (err, links) {
+    if (err) {
+      res.send('Error occurred: ' + err);
+    }
+    else {
+      res.render('profile.jade', { links: links.rows });
+    }
+  });
 });
 app.get('/login', function(req, res) {
   var errors = req.flash();
