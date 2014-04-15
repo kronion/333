@@ -28,17 +28,39 @@ CREATE TABLE IF NOT EXISTS followees (
 CREATE TABLE IF NOT EXISTS global_links (
   link_id timeuuid PRIMARY KEY,
   url text,
+  img_url text,
+  descrip text,
   count int
+);
+
+CREATE TABLE IF NOT EXISTS url_to_links (
+  url text PRIMARY KEY,
+  link_id timeuuid
 );
 
 CREATE TABLE IF NOT EXISTS user_links (
   user_id uuid,
-  link_id timeuuid,
+  user_link_id timeuuid,
   url text,
+  img_url text,
+  descrip text,
   caption text,
   privacy boolean,
-  PRIMARY KEY (user_id, link_id)
-) WITH CLUSTERING ORDER BY (link_id DESC);
+  PRIMARY KEY (user_id, user_link_id)
+) WITH CLUSTERING ORDER BY (user_link_id DESC);
+
+CREATE TABLE IF NOT EXISTS user_link_id_to_user (
+  user_link_id timeuuid PRIMARY KEY,
+  user_id uuid
+);
+
+CREATE TABLE IF NOT EXISTS commments (
+  user_link_id timeuuid,
+  comment_id timeuuid,
+  body text,
+  user_id uuid,
+  PRIMARY KEY(user_link_id, comment_id)
+) WITH CLUSTERING ORDER BY (comment_id DESC);
 
 CREATE TABLE IF NOT EXISTS links_to_tags (
   link_id timeuuid,

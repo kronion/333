@@ -18,6 +18,11 @@
 var fs = require('fs');
 var path = require('path');
 
+/* Parsers & related modules */
+var cheerio = require('cheerio');
+var request = require('request');
+var oembed = require('oembed');
+
 /* HTTP and HTTPS */
 var http = require('http');
 var https = require('https');
@@ -151,7 +156,7 @@ app.post('/', function(req, res) {
     client.execute(query, params, cql.types.consistencies.one, function(err, result) {
       if(err) {console.log(err);}
       else {
-        follower_id = result.rows[0].user_id;
+        var follower_id = result.rows[0].user_id;
         console.log(follower_id);
         var queries = [
           {
@@ -175,7 +180,7 @@ app.post('/', function(req, res) {
     var query1 = 'SELECT user_id FROM users WHERE email=?';
     var params1 = [req.body.removeFollower];
     client.execute(query1, params1, cql.types.consistencies.one, function(err, result) {
-      follower_id = result.rows[0].user_id;
+      var follower_id = result.rows[0].user_id;
       if(err) {console.log(err);}
       else {
         var queries1 = [
@@ -196,34 +201,169 @@ app.post('/', function(req, res) {
     });
   }
 
+
   if (req.body.addLink) {
-    var link_id = cql.types.timeuuid();
-    var queries2 = [
-      {
-        query: 'INSERT INTO global_links (link_id, url) VALUES (?,?)',
-        params: [link_id, req.body.addLink]
-      },
-      {
-        query: 'INSERT INTO user_links (user_id, link_id, url) VALUES (?,?,?)',
-        params: [req.user.user_id, link_id, req.body.addLink]
-      }
-    ];
-    client.executeBatch(queries2, cql.types.consistencies.one, function (err) {
+    var url = req.body.addLink;
+
+    var query2 = 'SELECT link_id FROM url_to_links WHERE url=?';
+    var params2 = [url];
+    client.execute(query2, params2, cql.types.consistencies.one, function(err, result) {
       if (err) {console.log(err);}
-      else {res.redirect('/');}
+
+      else {
+        if (result.rows[0]) {
+          var link_id = result.rows[0].link_id;
+
+          query2 = 'SELECT img_url, descrip FROM global_links WHERE link_id=?';
+          params2 = [link_id];
+
+          client.execute(query2, params2, cql.types.consistencies.one, function(err, result) {
+            if (err) {console.log(err);}
+
+            else {
+              var img_url = result.rows[0].img_url;
+              var descrip = result.rows[0].descrip;
+              var user_link_id = cql.types.timeuuid();
+
+              query2 = 'INSERT INTO user_links (user_id, user_link_id, url, img_url, descrip) VALUES (?,?,?,?,?)';
+              params2 = [req.user.user_id, user_link_id, url, img_url, descrip];
+
+              client.execute(query2, params2, cql.types.consistencies.one, function(err) {
+                if (err) {console.log(err);}
+                else {
+                  query2 = 'INSERT INTO user_link_id_to_user (user_link_id, user_id) VALUES (?,?)';
+                  params2 = [user_link_id, req.user.user_id];
+                  client.execute(query2, params2, cql.types.consistencies.one, function(err) {
+                    if (err) {console.log(error);}
+                    else {
+                      console.log('user_links & user_link_id_to_user table updated');
+                    }
+                  });
+                  
+                }
+              });
+            }
+          });
+        }
+
+
+        else {
+          request(url, function(err, resp, html) {
+            if (err) return console.error(err);
+
+            var $ = cheerio.load(html);
+
+            // Our parsed data will go here
+            var result = {};
+
+            $('meta').each(function(i, elem) {
+              var property = $(this).attr('property');
+              if (property) {
+                var propsplit = property.split(':');
+                var parent = result;
+
+                for (var j = 0; j < propsplit.length; j++) {
+                  var token = propsplit[j];
+
+                  if (j+1 == propsplit.length) {
+                    var content = $(this).attr('content');
+
+                    if (!parent[token]) {
+                      parent[token] = content;
+                    }
+                    else {
+                      if (Array.isArray(parent[token])) {
+                        parent[token].push(content);
+                      }
+                      else {
+                        var childarray = [parent[token], content];
+                        parent[token] = childarray;
+                      }
+                    }
+                  }
+                  else {
+                    if (!parent[token]) {
+                      parent[token] = {};
+                    }
+                    parent = parent[token];
+                  }
+                }
+              }
+            });
+            var json = JSON.parse(JSON.stringify(result, null, '\t'));
+
+            var link_id = cql.types.timeuuid();
+            var user_link_id = cql.types.timeuuid();
+            var img_url = json.og.image;
+            var descrip = json.og.description;
+
+            var queries2 = [
+              {
+                query: 'INSERT INTO global_links (link_id, url, img_url, descrip) VALUES (?,?,?,?)',
+                params: [link_id, url, img_url, descrip]
+              },
+              {
+                query: 'INSERT INTO user_links (user_id, user_link_id, url, img_url, descrip) VALUES (?,?,?,?,?)',
+                params: [req.user.user_id, user_link_id, url, img_url, descrip]
+              },
+              {
+                query: 'INSERT INTO url_to_links (url, link_id) VALUES (?,?)',
+                params: [url, link_id]
+              },
+              {
+                query: 'INSERT INTO user_link_id_to_user (user_link_id, user_id) VALUES (?,?)',
+                params: [user_link_id, req.user.user_id]
+              }
+            ];
+            client.executeBatch(queries2, cql.types.consistencies.one, function (err) {
+              if (err) {console.log(err);}
+              else {
+                console.log('parsed and updated everything (now with user_link_ids)');
+              }
+            });
+          });
+        }
+        res.redirect('/');
+      }
     });
   }
 });
 
-app.get('/pages/:name', function(req, res) {
-  var query = 'SELECT * FROM user_links WHERE name=?';
-  client.executeAsPrepared(query, [req.params.name], 
-                           cql.types.consistencies.one, function (err, links) {
-    if (err) {
-      res.send('Error occurred: ' + err);
-    }
+app.get('/pages/:email', function(req, res) {
+  var query = 'SELECT user_id FROM users WHERE email=?';
+  var params = [req.params.email];
+  client.execute(query, params, cql.types.consistencies.one, function (err, result) {
+    if (err) {console.log(err);}
     else {
-      res.render('profile.jade', { links: links.rows });
+      var user_id = result.rows[0].user_id;
+      query = 'SELECT url FROM user_links WHERE user_id=?';
+      params = [user_id];
+      client.execute(query, params, cql.types.consistencies.one, function(err, result) {
+        if(err) {console.log(err);}
+        else {
+          var rows = result.rows;
+          var links = [];
+          
+          for (var i = 0; i < rows.length; i++) {
+            links[i] = rows[i].url;
+          }
+
+          query = 'SELECT img_url FROM user_links WHERE user_id=?';
+          params = [user_id];
+          client.execute(query, params, cql.types.consistencies.one, function(err, result) {
+            if(err) {console.log(err);}
+            else {
+              rows= result.rows;
+              var image_sources = [];
+
+              for (i = 0; i < rows.length; i++) {
+                image_sources[i] = rows[i].img_url;
+              }
+              res.render('profile.jade', {links: links, image_sources: image_sources});
+            }
+          });
+        }
+      });
     }
   });
 });

@@ -3,4 +3,6 @@ html
   head
   body
     each link in links
-      p= link.url
+      p= link
+    each source in image_sources
+      img(src = source)
