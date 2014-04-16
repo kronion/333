@@ -134,7 +134,7 @@ app.locals({
 /* Routing */
 app.get('/', function(req, res) {
   if (req.user) {
-    res.render('home.jade');
+    res.render('home.jade', { user: req.user });
   }
   else {
     res.render('front.jade');
