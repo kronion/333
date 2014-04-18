@@ -131,6 +131,7 @@ app.locals({
   flash: {}
 });
 
+
 /* Routing */
 app.get('/', function(req, res) {
   if (req.user) {
@@ -140,6 +141,28 @@ app.get('/', function(req, res) {
     res.render('front.jade');
   }
 });
+
+/* For bookmarklet purposes: adding a link via GET request */
+app.get('/bookmark/:uri_enc', function(req, res) {
+  // console.log(req.params.uri_enc);
+  // uri = decodeURIcomponent(req.params.uri_enc);
+  // enc = encodeURIcomponent;
+  uri = req.params.uri_enc;
+  /* Just copy pasted - is there a better way to do this? */
+  if (req.user) {
+    var query2 = 'INSERT INTO userlinks (username, url) VALUES (?, ?)';
+      client.execute(query2, [req.user.username, uri],
+                          cql.types.consistencies.one, function (err) {
+        if (err) {console.log(err);}
+        else { document.write("Link saved!");
+          res.redirect('/pages/'+ (req.user.username));}
+      });
+  }
+  else {
+    res.render('front.jade') // what to do if not logged in ??? 
+  }
+});
+
 app.post('/', function(req, res) {
   if(req.body.addFollower) {
     var query = 'UPDATE users SET followers = followers + {?} WHERE username=?';
@@ -195,6 +218,7 @@ app.get('/pages/:name', function(req, res) {
     }
   });
 });
+
 app.get('/login', function(req, res) {
   var errors = req.flash();
   var results = [];
