@@ -5,13 +5,14 @@ html(lang="en")
   body
     include banner
     div.content
-      form.pure-form.right(action='/' method='post')
-        input(type='text' name='addFollower' placeholder='AddFollower Here' autofocus=true required=true)
-        input(type='submit' value='Submit')
-      form.right(action='/' method='post')
-        input(type='text' name='removeFollower' placeholder='RemoveFollower Here' autofocus=true required=true)
-        input(type='submit' value='Submit')
-      form.right(action='/' method='post')
-        input(type='url' name='addLink' placeholder='AddLink Here' autofocus=true required=true)
-        input(type='submit' value='Submit')
+      div.feed
+        form.pure-form(action='/' method='post')
+          input(type='text' name='addFollower' placeholder='AddFollower Here' autofocus=true required=true)
+          input(type='submit' value='Submit')
+        form(action='/' method='post')
+          input(type='text' name='removeFollower' placeholder='RemoveFollower Here' autofocus=true required=true)
+          input(type='submit' value='Submit')
+        form(action='/' method='post')
+          input(type='url' name='addLink' placeholder='AddLink Here' autofocus=true required=true)
+          input(type='submit' value='Submit')
     include scripts
