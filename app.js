@@ -6,16 +6,22 @@
  *   Description:   Root server file, acts as the point of connection between
  *                  client and routing logic.
  *
- *      Version:    0.0.1
- *      Created:    3/5/14 3:31:18 AM
+ *       Version:   0.0.1
+ *       Created:   3/5/14 3:31:18 AM
  *
- *       Author:    Collin Stedman
+ *        Author:   Collin Stedman
  *
  * =============================================================================
  */
 
 /* File system */
 var fs = require('fs');
+var path = require('path');
+
+/* Parsers & related modules */
+var cheerio = require('cheerio');
+var request = require('request');
+var oembed = require('oembed');
 
 /* HTTP and HTTPS */
 var http = require('http');
@@ -25,11 +31,14 @@ var https = require('https');
 var privateKey = fs.readFileSync('server.key', 'utf8');
 var certificate = fs.readFileSync('server.crt', 'utf8');
 var pem_key = fs.readFileSync('pem_key', 'utf8');
-var credentials = { 
-  key: privateKey, 
+var credentials = {
+  key: privateKey,
   cert: certificate,
   passphrase: pem_key
 };
+
+/* Secret key to be used later */
+var secret = require('./keyfile.js');
 
 /* Secret key to be used later */
 var secret = require('./keyfile.js');
@@ -63,14 +72,15 @@ app.use(function (req, res, next) {
 var CasStore = require('connect-cassandra-cql')(express),
     cql = require('node-cassandra-cql'),
     CasClient = cql.Client;
-var client = new CasClient({ hosts: ['localhost'], keyspace: 'blabrr' });
+var client = new CasClient({ hosts: ['localhost'], keyspace: 'getchive' });
 var config = { client: client };
 app.use(express.cookieParser())
+   .use(express.methodOverride())
    .use(express.json())
    .use(express.urlencoded())
    .use(express.session({
-     secret: secret, 
-     key: 'sid', 
+     secret: secret,
+     key: 'sid',
      cookie: {
        secure: true
      },
@@ -88,66 +98,430 @@ app.use(express.compress())
 /* Passport */
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
-passport.use(new LocalStrategy(
-  function(username, password, done) {
-    var query = 'SELECT * FROM users WHERE username=?';
-    client.executeAsPrepared(query, [username], cql.types.consistencies.one, function (err, user) {
-      if (err) { 
-        return done(err); 
+passport.use(new LocalStrategy({
+    usernameField: 'email',
+    passwordField: 'password'
+  },
+  function(email, password, done) {
+    var query = 'SELECT * FROM users WHERE email=?';
+    client.executeAsPrepared(query, [email], cql.types.consistencies.one,
+                             function (err, user) {
+      if (err) {
+        return done(err);
       }
       if (!user.rows[0]) {
-        return done(null, false, { 'message': 'Incorrect username.' }); 
+        return done(null, false, { 'message': strings.incorrect_username });
       }
       if (user.rows[0].password != password) {
-        return done(null, false, { 'message': 'Incorrect password.' });
+        return done(null, false, { 'message': strings.incorrect_password });
       }
       return done(null, user.rows[0]);
     });
   }
 ));
+
 passport.serializeUser(function(user, done) {
-  // Create user ID somehow
-  done(null, user.username);
+  done(null, user.user_id);
 });
 passport.deserializeUser(function(id, done) {
-  var query = 'SELECT * FROM users WHERE username=?';
-  client.executeAsPrepared(query, [id], cql.types.consistencies.one, function (err, user) {
-    done(err, user.rows[0]);
-  });
+  var query = 'SELECT * FROM users WHERE user_id=?';
+  client.executeAsPrepared(query, [id], cql.types.consistencies.one, function (err, user) {
+    done(err, user.rows[0]);
+  });
 });
+
+var FacebookStrategy = require('passport-facebook').Strategy;
+
+passport.use(new FacebookStrategy({
+    clientID: "656697897711155",
+    clientSecret: "da59fa7c8e4cc617c40793b45ac31b97",
+    callbackURL: "https://localhost:8443/auth/facebook/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+    // asynchronous verification, for effect...
+    process.nextTick(function () {
+      var query0 = 'SELECT * FROM users WHERE email = ?';
+      client.execute(query0, [profile['username']], cql.types.consistencies.one, function(err, result) {
+        if (err) {
+          return done(err);
+        }
+        else if (result.rows[0]) {
+          var query1 = 'SELECT * FROM users WHERE email = ?';
+          client.execute(query1, [profile['username']], cql.types.consistencies.one, function(err, user) {
+            if (err) {
+              return done(err);
+            }
+            else {
+              return done(null, user.rows[0]);
+            }
+          });
+        }
+        else {
+          var user_id = cql.types.uuid();
+
+          var query2 = 'INSERT INTO users (user_id, fbid, email, first_name, last_name) values (?, ?, ?, ?, ?)';
+
+          client.execute(query2, [user_id, profile['id'], profile['username'], profile['name']['givenName'], profile['name']['familyName']], cql.types.consistencies.one, function(err, result) {
+            if (err) {
+              return done(err);
+            }
+            else {
+              query1 = 'SELECT * FROM users WHERE email = ?';
+              client.execute(query1, [profile['username']], cql.types.consistencies.one, function(err, user) {
+                if (err) {
+                  return done(err);
+                }
+                else {
+                  return done(null, user.rows[0]);
+                }
+              })
+            }
+          });
+        }
+      });
+    });
+  }
+));
+
 app.use(passport.initialize())
    .use(passport.session());
 
 /* Jade templating */
-app.set('views', __dirname + '/views');
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.locals({
-  title: 'Blabrr',
+  title: 'GetChive',
   flash: {}
-})
+});
 
+var PriorityQueue = require('priorityqueuejs');
 /* Routing */
 app.get('/', function(req, res) {
+
   if (req.user) {
-    res.render('home.jade');
+    var query = 'SELECT * FROM timeline WHERE user_id = ?';
+    var params = [req.user.user_id];
+    var links = [];
+    var image_sources = [];
+    var timedecay = [];
+    client.execute(query, params, cql.types.consistencies.one, function(err, result) {
+      if (err) {console.log(err);}
+      else {
+        var rows = result.rows;
+        if (rows) {
+          for (var i = 0; i < rows.length; i++) {
+            links[i] = rows[i].url;
+            image_sources[i] = rows[i].img_url;
+          }
+          query = 'SELECT dateOf(user_link_id) FROM timeline where user_id =?';
+          params = [req.user.user_id];
+          client.execute(query, params, cql.types.consistencies.one, function(err, result) {
+            if (err) {console.log(err);}
+            else {
+              var rows = result.rows;
+              if (rows) {
+                var queue = new PriorityQueue(function(a, b) {
+                  return a.timedecay - b.timedecay;
+                });
+                for (var i =0; i < rows.length; i++) {
+                  timedecay[i] = 1/(Date.now() - rows[i]['dateOf(user_link_id)']);
+                  queue.enq({timedecay: timedecay[i], link: links[i], image: image_sources[i]});
+                }
+              }
+            }
+          });
+          res.render('home.jade', {links: links, image_sources: image_sources});
+        }
+
+      }
+    })
   }
   else {
     res.render('front.jade');
   }
 });
-app.get('/user', function(req, res) {
-  res.send('Hello, ' + req.user.username + '!');
-  console.log(req.user);
-  console.log(req.session);
+
+app.post('/', function(req, res) {
+  if(req.body.addFollower) {
+    var query = 'SELECT user_id FROM users WHERE email=?';
+    var params = [req.body.addFollower];
+    client.execute(query, params, cql.types.consistencies.one, function(err, result) {
+      if(err) {console.log(err);}
+      else {
+        var follower_id = result.rows[0].user_id;
+        var queries = [
+          {
+            query: 'INSERT INTO followers (user_id, follower_id) VALUES (?,?)',
+            params: [req.user.user_id, follower_id]
+          },
+          {
+            query: 'INSERT INTO followees (user_id, followee_id) VALUES (?,?)',
+            params: [follower_id, req.user.user_id]
+          }
+        ];
+        client.executeBatch(queries, cql.types.consistencies.one, function (err) {
+
+          if (err) {console.log(err);}
+          else {res.redirect('/');}
+        });
+      }
+    });
+  }
+
+  if(req.body.removeFollower) {
+    var query1 = 'SELECT user_id FROM users WHERE email=?';
+    var params1 = [req.body.removeFollower];
+    client.execute(query1, params1, cql.types.consistencies.one, function(err, result) {
+      var follower_id = result.rows[0].user_id;
+      if(err) {console.log(err);}
+      else {
+        var queries1 = [
+          {
+            query: 'DELETE FROM followers WHERE user_id=? AND follower_id=?',
+            params: [req.user.user_id, follower_id]
+          },
+          {
+            query: 'DELETE FROM followees WHERE user_id=? AND followee_id=?',
+            params: [follower_id, req.user.user_id]
+          }
+        ];
+        client.executeBatch(queries1, cql.types.consistencies.one, function (err) {
+          if (err) {console.log(err);}
+          else {res.redirect('/');}
+        });
+      }
+    });
+  }
+
+
+  if (req.body.addLink) {
+    var url = req.body.addLink;
+
+    var query2 = 'SELECT link_id FROM url_to_links WHERE url=?';
+    var params2 = [url];
+    client.execute(query2, params2, cql.types.consistencies.one, function(err, result) {
+      if (err) {console.log(err);}
+
+      else {
+        if (result.rows[0]) {
+          var link_id = result.rows[0].link_id;
+
+          query2 = 'SELECT img_url, descrip FROM global_links WHERE link_id=?';
+          params2 = [link_id];
+
+          client.execute(query2, params2, cql.types.consistencies.one, function(err, result) {
+            if (err) {console.log(err);}
+
+            else {
+              var img_url = result.rows[0].img_url;
+              var descrip = result.rows[0].descrip;
+              var user_link_id = cql.types.timeuuid();
+
+              query2 = 'INSERT INTO user_links (user_id, user_link_id, url, img_url, descrip) VALUES (?,?,?,?,?)';
+              params2 = [req.user.user_id, user_link_id, url, img_url, descrip];
+
+              client.execute(query2, params2, cql.types.consistencies.one, function(err) {
+                if (err) {console.log(err);}
+                else {
+                  query2 = 'INSERT INTO user_link_id_to_user (user_link_id, user_id) VALUES (?,?)';
+                  params2 = [user_link_id, req.user.user_id];
+                  client.execute(query2, params2, cql.types.consistencies.one, function(err) {
+                    if (err) {console.log(error);}
+                    else {
+                      query2 = 'SELECT * FROM followees WHERE user_id = ?';
+                      params2 = [req.user.user_id];
+                      client.execute(query2, params2, cql.types.consistencies.one, function (err, result) {
+                        if (err) {console.log(err);}
+                        else {
+                          var rows = result.rows;
+                          if (rows) {
+                            for (var i = 0; i < rows.length; i++) {
+                              query2 = 'INSERT INTO timeline (user_id, user_link_id, owner_id, url, img_url, descrip) VALUES (?, ?, ?, ?, ?, ?)';
+                              params2 = [rows[i].followee_id, user_link_id, req.user.user_id, url, img_url, descrip];
+                              client.execute(query2, params2, cql.types.consistencies.one, function(err) {
+                                if (err) {console.log(err);}
+                                else {
+                                  console.log('Successfully inserted into followees timeline');
+                                }
+                              });
+                            }
+                          }
+                        }
+                      });
+                    }
+                  });
+                }
+              });
+            }
+          });
+        }
+        else {
+          request(url, function(err, resp, html) {
+            if (err) return console.error(err);
+
+            var $ = cheerio.load(html);
+
+            // Our parsed data will go here
+            var result = {};
+
+            $('meta').each(function(i, elem) {
+              var property = $(this).attr('property');
+              if (property) {
+                var propsplit = property.split(':');
+                var parent = result;
+
+                for (var j = 0; j < propsplit.length; j++) {
+                  var token = propsplit[j];
+
+                  if (j+1 == propsplit.length) {
+                    var content = $(this).attr('content');
+
+                    if (!parent[token]) {
+                      parent[token] = content;
+                    }
+                    else {
+                      if (Array.isArray(parent[token])) {
+                        parent[token].push(content);
+                      }
+                      else {
+                        var childarray = [parent[token], content];
+                        parent[token] = childarray;
+                      }
+                    }
+                  }
+                  else {
+                    if (!parent[token]) {
+                      parent[token] = {};
+                    }
+                    parent = parent[token];
+                  }
+                }
+              }
+            });
+            var json = JSON.parse(JSON.stringify(result, null, '\t'));
+
+            var link_id = cql.types.timeuuid();
+            var user_link_id = cql.types.timeuuid();
+            var img_url = json.og.image;
+            var descrip = json.og.description;
+
+            var queries2 = [
+              {
+                query: 'INSERT INTO global_links (link_id, url, img_url, descrip) VALUES (?,?,?,?)',
+                params: [link_id, url, img_url, descrip]
+              },
+              {
+                query: 'INSERT INTO user_links (user_id, user_link_id, url, img_url, descrip) VALUES (?,?,?,?,?)',
+                params: [req.user.user_id, user_link_id, url, img_url, descrip]
+              },
+              {
+                query: 'INSERT INTO url_to_links (url, link_id) VALUES (?,?)',
+                params: [url, link_id]
+              },
+              {
+                query: 'INSERT INTO user_link_id_to_user (user_link_id, user_id) VALUES (?,?)',
+                params: [user_link_id, req.user.user_id]
+              }
+            ];
+            client.executeBatch(queries2, cql.types.consistencies.one, function (err) {
+              if (err) {console.log(err);}
+              else {
+                var rows = result
+                console.log('parsed and updated everything (now with user_link_ids)');
+                query2 = 'SELECT * FROM followees WHERE user_id = ?';
+                params2 = [req.user.user_id];
+                client.execute(query2, params2, cql.types.consistencies.one, function (err, result) {
+                  if (err) {console.log(err);}
+                  else {
+                    var rows = result.rows;
+                    if (rows) {
+                      for (var i = 0; i < rows.length; i++) {
+                        query2 = 'INSERT INTO timeline (user_id, user_link_id, owner_id, url, img_url, descrip) VALUES (?, ?, ?, ?, ?, ?)';
+                        params2 = [rows[i].followee_id, user_link_id, req.user.user_id, url, img_url, descrip];
+                        client.execute(query2, params2, cql.types.consistencies.one, function(err) {
+                          if (err) {console.log(err);}
+                          else {
+                            console.log('Successfully inserted into followees timeline');
+                          }
+                        });
+                      }
+                    }
+                  }
+                });
+              }
+            });
+          });
+        }
+        res.redirect('/');
+      }
+    });
+  }
 });
-app.get('/test', function(req, res) {
-  res.render('home.jade');
+
+app.get('/pages/:email', function(req, res) {
+  var query = 'SELECT user_id FROM users WHERE email=?';
+  var params = [req.params.email];
+  client.execute(query, params, cql.types.consistencies.one, function (err, result) {
+    if (err) {console.log(err);}
+    else {
+      var user_id = result.rows[0].user_id;
+      query = 'SELECT url FROM user_links WHERE user_id=?';
+      params = [user_id];
+      client.execute(query, params, cql.types.consistencies.one, function(err, result) {
+        if(err) {console.log(err);}
+        else {
+          var rows = result.rows;
+          var links = [];
+
+          for (var i = 0; i < rows.length; i++) {
+            links[i] = rows[i].url;
+          }
+
+          query = 'SELECT img_url FROM user_links WHERE user_id=?';
+          params = [user_id];
+          client.execute(query, params, cql.types.consistencies.one, function(err, result) {
+            if(err) {console.log(err);}
+            else {
+              rows= result.rows;
+              var image_sources = [];
+
+              for (i = 0; i < rows.length; i++) {
+                image_sources[i] = rows[i].img_url;
+              }
+              res.render('profile.jade', {links: links, image_sources: image_sources});
+            }
+          });
+        }
+      });
+    }
+  });
 });
+
+// Redirect the user to Facebook for authentication.  When complete,
+// Facebook will redirect the user back to the application at
+//     /auth/facebook/callback
+app.get('/auth/facebook',
+  passport.authenticate('facebook'));
+
+// Facebook will redirect the user to this URL after approval.  Finish the
+// authentication process by attempting to obtain an access token.  If
+// access was granted, the user will be logged in.  Otherwise,
+// authentication has failed.
+app.get('/auth/facebook/callback',
+  passport.authenticate('facebook', { successRedirect: '/',
+                                      failureRedirect: '/login' }))
+
 app.get('/login', function(req, res) {
-  // MAKE THIS A NEW PAGE
-  res.render('front.jade', { flash: req.flash() });
+  var errors = req.flash();
+  var results = [];
+  if (errors.error) {
+    for (var i = 0; i < errors.error.length; i++) {
+      results.push(JSON.parse(errors.error[i]));
+    }
+  }
+  res.render('login.jade', { flash: results });
 });
-app.post('/login', 
+app.post('/login',
   passport.authenticate('local', { successRedirect: '/',
                                    failureRedirect: '/login',
                                    failureFlash: true }));
@@ -156,11 +530,11 @@ app.get('/logout', function(req, res) {
   res.redirect('/');
 });
 app.post('/signup', function(req, res) {
-  var query = 'INSERT INTO users (username, password) values (?, ?)';
-  client.executeAsPrepared(query, [req.body.username, req.body.password],
-                            cql.types.consistencies.one, function (err) {
+  var user_id = cql.types.uuid();
+  var query = 'INSERT INTO users (user_id, email, password) values (?,?,?)';
+  var params = [user_id, req.body.email, req.body.password];
+  client.executeAsPrepared(query, params, cql.types.consistencies.one, function (err) {
     if (err) {
-      // Do something better here
       console.log(err);
     }
     else {

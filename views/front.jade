@@ -10,7 +10,12 @@ html(lang='en')
     div.banner
       h1.left Blabrr
       form.right(action='/login' method='post')
-        input(type='text' name='username' placeholder='username' autofocus=true required=true)
+        input(type='text' name='email' placeholder='email' autofocus=true required=true)
         input(type='password' name='password' placeholder='password' required=true)
         input(type='submit' value='Submit')
     a(href='signup.html') Sign up here
+
+    a(href='/auth/facebook')
+      img(src='login-with-facebook.png', width='154', height='22')
+
+    include scripts
