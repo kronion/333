@@ -190,7 +190,8 @@ app.get('/pages/:name', function(req, res) {
       res.send('Error occurred: ' + err);
     }
     else {
-      res.render('profile.jade', { links: links.rows });
+      res.render('profile.jade', { links: links.rows,
+                                   user: req.user });
     }
   });
 });
