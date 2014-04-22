@@ -4,7 +4,9 @@ html(lang="en")
     include base_head
   body
     include banner
-    div#content
+    div.content
       each link in links
-        p= link.url
+        p= link
+      each source in image_sources
+        img(src = source, height='42', width='42')
     include page_scripts

@@ -6,7 +6,7 @@ div.pure-g-r.banner
           h4
             a(href='/') Newsfeed
           h4
-            a(href='/pages/#{user.username}')=user.username
+            a(href='/pages/#{user.email}')=user.email
         div.pure-hidden-phone
           span
             a.fui-new
@@ -28,7 +28,7 @@ div.pure-g-r.banner
         a(href='/logout') Logout
     else
       form.pure-form(action='/login' method='post')
-        input.input(type='text' name='username' placeholder='username' autofocus=true required=true)
+        input.input(type='text' name='email' placeholder='email' autofocus=true required=true)
         input.input(type='password' name='password' placeholder='password' required=true)
         input.pure-button.button-primary.input(type='submit' value='Submit')
       h1

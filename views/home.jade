@@ -6,13 +6,17 @@ html(lang="en")
     include banner
     div.content
       div.feed
-        form.pure-form(action='/' method='post')
+        form.pure-form(action='/addFollower' method='post')
           input(type='text' name='addFollower' placeholder='AddFollower Here' autofocus=true required=true)
           input(type='submit' value='Submit')
-        form(action='/' method='post')
+        form(action='/removeFollower' method='post')
           input(type='text' name='removeFollower' placeholder='RemoveFollower Here' autofocus=true required=true)
           input(type='submit' value='Submit')
-        form(action='/' method='post')
+        form(action='/addLink' method='post')
           input(type='url' name='addLink' placeholder='AddLink Here' autofocus=true required=true)
           input(type='submit' value='Submit')
+        each link in links
+          p=link
+        each source in image_sources
+          img(src = source, height='400', width='400')
     include scripts
