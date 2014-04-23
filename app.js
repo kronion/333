@@ -14,6 +14,8 @@
  * =============================================================================
  */
 
+var PriorityQueue = require('priorityqueuejs');
+
 /* File system */
 var fs = require('fs');
 var path = require('path');
@@ -142,7 +144,77 @@ app.locals({
 /* Routing */
 app.get('/', function(req, res) {
   if (req.user) {
-    res.render('home.jade');
+    // var query = 'SELECT url FROM user_links WHERE user_id=?';
+    // var params = [req.user.user_id];
+    // var links = [];
+    // var image_sources = [];
+    // client.execute(query, params, cql.types.consistencies.one, function(err, result) {
+    //   if(err) {console.log(err);}
+    //   else {
+    //     var rows = result.rows;
+        
+    //     if (rows) {
+    //       for (var i = 0; i < rows.length; i++) {
+    //         links[i] = rows[i].url;
+    //       }
+
+    //       query = 'SELECT img_url FROM user_links WHERE user_id=?';
+    //       params = [req.user.user_id];
+    //       client.execute(query, params, cql.types.consistencies.one, function(err, result) {
+    //         if(err) {console.log(err);}
+    //         else {
+    //           rows= result.rows;
+
+    //           for (i = 0; i < rows.length; i++) {
+    //             image_sources[i] = rows[i].img_url;
+    //           }
+    //           res.render('home.jade', {links: links, image_sources: image_sources});
+    //         }
+    //       });
+    //     }
+    //     else {
+    //       res.render('home.jade', {links: links, image_sources: image_sources});
+    //     }
+    //   }
+    // });
+
+    var query = 'SELECT * FROM timeline WHERE user_id=?';
+    var params = [req.user.user_id];
+    var links = [];
+    var image_sources = [];
+    var timedecay = [];
+    client.execute(query, params, cql.types.consistencies.one, function(err, result) {
+      if (err) {console.log(err);}
+      else {
+        var rows = result.rows;
+        if (rows) {
+          for (var i = 0; i < rows.length; i++) {
+            links[i] = rows[i].url;
+            image_sources[i] = rows[i].img_url;
+          }
+        }
+        query = 'SELECT dateOf(user_link_id) FROM timeline WHERE user_id=?';
+        params = [req.user.user_id];
+        client.execute(query, params, cql.types.consistencies.one, function(err, result) {
+          if (err) {console.log(err);}
+          else {
+            var rows = result.rows;
+            if (rows) {
+              var queue = new PriorityQueue(function(a, b) {
+                return a.timedecay - b.timedecay;
+              });
+              for (var i = 0; i < rows.length; i++) {
+                timedecay[i] = 1/(Date.now()-rows[i]['dateOf(user_link_id)']);
+                queue.enq({timedecay: timedecay[i], link: links[i], image: image_sources[i]});
+              }
+              console.log('Priority queue updated');
+            }
+          }
+        });
+
+        res.render('home.jade', {links: links, image_sources: image_sources});
+      }
+    });
   }
   else {
     res.render('front.jade');
@@ -237,6 +309,28 @@ app.post('/', function(req, res) {
                     if (err) {console.log(error);}
                     else {
                       console.log('user_links & user_link_id_to_user table updated');
+                      query2 = 'SELECT * FROM followees WHERE user_id=?';
+                      params2 = [req.user.user_id];
+                      client.execute(query2, params2, cql.types.consistencies.one,
+                        function(err, result) {
+                          if (err) {console.log(err);}
+                          else {
+                            var rows = result.rows;
+                            if (rows) {
+                              for (var i = 0; i < rows.length; i++) {
+                                query2 = 'INSERT INTO timeline (user_id, user_link_id, owner_id, url, img_url, descrip) VALUES (?,?,?,?,?,?)';
+                                params2 = [rows[i].followee_id, user_link_id, req.user.user_id, url, img_url, descrip];
+                                client.execute(query2, params2, cql.types.consistencies.one,
+                                  function(err) {
+                                    if (err) {console.log(err);}
+                                    else {
+                                      console.log('Successfully inserted into followees timeline');
+                                    }
+                                  });
+                              }
+                            }
+                          }
+                        });
                     }
                   });
                   
@@ -319,6 +413,28 @@ app.post('/', function(req, res) {
               if (err) {console.log(err);}
               else {
                 console.log('parsed and updated everything (now with user_link_ids)');
+                query2 = 'SELECT * FROM followees WHERE user_id=?';
+                params2 = [req.user.user_id];
+                client.execute(query2, params2, cql.types.consistencies.one,
+                  function(err, result) {
+                    if (err) {console.log(err);}
+                    else {
+                      var rows = result.rows;
+                      if (rows) {
+                        for (var i = 0; i < rows.length; i++) {
+                          query2 = 'INSERT INTO timeline (user_id, user_link_id, owner_id, url, img_url, descrip) VALUES (?,?,?,?,?,?)';
+                          params2 = [rows[i].followee_id, user_link_id, req.user.user_id, url, img_url, descrip];
+                          client.execute(query2, params2, cql.types.consistencies.one,
+                            function(err) {
+                              if (err) {console.log(err);}
+                              else {
+                                console.log('Successfully inserted into followees timeline');
+                              }
+                            });
+                        }
+                      }
+                    }
+                  });
               }
             });
           });
@@ -327,6 +443,10 @@ app.post('/', function(req, res) {
       }
     });
   }
+});
+
+app.get('/home', function(req, res) {
+  res.redirect('/pages/'+req.user.email);
 });
 
 app.get('/pages/:email', function(req, res) {
@@ -344,24 +464,29 @@ app.get('/pages/:email', function(req, res) {
           var rows = result.rows;
           var links = [];
           
-          for (var i = 0; i < rows.length; i++) {
-            links[i] = rows[i].url;
-          }
-
-          query = 'SELECT img_url FROM user_links WHERE user_id=?';
-          params = [user_id];
-          client.execute(query, params, cql.types.consistencies.one, function(err, result) {
-            if(err) {console.log(err);}
-            else {
-              rows= result.rows;
-              var image_sources = [];
-
-              for (i = 0; i < rows.length; i++) {
-                image_sources[i] = rows[i].img_url;
-              }
-              res.render('profile.jade', {links: links, image_sources: image_sources});
+          if (rows) {
+            for (var i = 0; i < rows.length; i++) {
+              links[i] = rows[i].url;
             }
-          });
+
+            query = 'SELECT img_url FROM user_links WHERE user_id=?';
+            params = [user_id];
+            client.execute(query, params, cql.types.consistencies.one, function(err, result) {
+              if(err) {console.log(err);}
+              else {
+                rows= result.rows;
+                var image_sources = [];
+
+                for (i = 0; i < rows.length; i++) {
+                  image_sources[i] = rows[i].img_url;
+                }
+                res.render('profile.jade', {links: links, image_sources: image_sources});
+              }
+            });
+          }
+          else {
+            res.send("No links to show");
+          }
         }
       });
     }

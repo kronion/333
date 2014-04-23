@@ -73,3 +73,14 @@ CREATE TABLE IF NOT EXISTS tags_to_links (
   tag text,
   PRIMARY KEY (tag, link_id)
 ) WITH CLUSTERING ORDER BY (link_id DESC);
+
+CREATE TABLE IF NOT EXISTS timeline (
+  user_id uuid,
+  user_link_id timeuuid,
+  owner_id uuid,
+  url text,
+  img_url text,
+  descrip text,
+  caption text,
+  PRIMARY KEY (user_id, user_link_id)
+) WITH CLUSTERING ORDER BY (user_link_id DESC);

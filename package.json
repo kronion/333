@@ -22,7 +22,8 @@
     "connect-flash": "~0.1.1",
     "oembed": "^0.1.0",
     "cheerio": "^0.15.0",
-    "request": "^2.34.0"
+    "request": "^2.34.0",
+    "priorityqueuejs": "^0.2.0"
   },
   "devDependencies": {
     "grunt": "~0.4.2",

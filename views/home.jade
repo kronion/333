@@ -17,4 +17,9 @@ html(lang="en")
       input(type='url' name='addLink' placeholder='AddLink Here' autofocus=true required=true)
       input(type='submit' value='Submit')
 
+    each link in links
+      p= link
+    each source in image_sources
+      img(src = source)
+
     a(href='/logout') Logout
