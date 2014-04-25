@@ -82,6 +82,7 @@ app.locals({
   flash: {}
 });
 
+
 /* Routing */
 var home = require('./routes/home.js')(client, cql);
 var followers = require('./routes/followers.js')(client, cql);
