@@ -26,17 +26,11 @@ var https = require('https');
 var privateKey = fs.readFileSync('server.key', 'utf8');
 var certificate = fs.readFileSync('server.crt', 'utf8');
 var pem_key = fs.readFileSync('pem_key', 'utf8');
-var credentials = { 
-  key: privateKey, 
+var credentials = {
+  key: privateKey,
   cert: certificate,
   passphrase: pem_key
 };
-
-/* Secret key to be used later */
-var secret = require('./keyfile.js');
-
-/* Strings */
-var strings = require('./strings.js');
 
 /* Express */
 var express = require('express');
@@ -64,22 +58,10 @@ app.use(function (req, res, next) {
 });
 
 /* DB and sessions */
-var CasStore = require('connect-cassandra-cql')(express),
-    cql = require('node-cassandra-cql'),
-    CasClient = cql.Client;
-var client = new CasClient({ hosts: ['localhost'], keyspace: 'blabrr' });
-var config = { client: client };
-app.use(express.cookieParser())
-   .use(express.json())
-   .use(express.urlencoded())
-   .use(express.session({
-     secret: secret, 
-     key: 'sid', 
-     cookie: {
-       secure: true
-     },
-     store: new CasStore(config)
-   }));
+var db = require('./models/db.js');
+db.configure(app, express);
+var client = db.client;
+var cql = db.cql;
 
 /* Flash messages */
 var flash = require('connect-flash');
@@ -90,134 +72,45 @@ app.use(express.compress())
    .use(express.static(__dirname + '/public'));
 
 /* Passport */
-var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
-passport.use(new LocalStrategy(
-  function(username, password, done) {
-    var query = 'SELECT * FROM users WHERE username=?';
-    client.executeAsPrepared(query, [username], cql.types.consistencies.one, 
-                             function (err, user) {
-      if (err) { 
-        return done(err); 
-      }
-      if (!user.rows[0]) {
-        return done(null, false, { 'message': strings.incorrect_username }); 
-      }
-      if (user.rows[0].password != password) {
-        return done(null, false, { 'message': strings.incorrect_password });
-      }
-      return done(null, user.rows[0]);
-    });
-  }
-));
-passport.serializeUser(function(user, done) {
-  // Create user ID somehow
-  done(null, user.username);
-});
-passport.deserializeUser(function(id, done) {
-  var query = 'SELECT * FROM users WHERE username=?';
-  client.executeAsPrepared(query, [id], cql.types.consistencies.one, function (err, user) {
-    done(err, user.rows[0]);
-  });
-});
-app.use(passport.initialize())
-   .use(passport.session());
+var passport = require('./routes/authenticate.js')(app, client, cql);
 
 /* Jade templating */
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.locals({
-  title: 'Blabrr',
+  title: 'GetChive',
   flash: {}
 });
 
 
 /* Routing */
-app.get('/', function(req, res) {
-  if (req.user) {
-    res.render('home.jade', { user: req.user });
-  }
-  else {
-    res.render('front.jade');
-  }
-});
+var home = require('./routes/home.js')(client, cql);
+var followers = require('./routes/followers.js')(client, cql);
+var pages = require('./routes/pages.js')(client, cql);
 
-/* For bookmarklet purposes: adding a link via GET request */
-app.get('/bookmark/:uri_enc', function(req, res) {
-  // console.log(req.params.uri_enc);
-  // uri = decodeURIcomponent(req.params.uri_enc);
-  // enc = encodeURIcomponent;
-  uri = req.params.uri_enc;
-  /* Just copy pasted - is there a better way to do this? */
-  if (req.user) {
-    var query2 = 'INSERT INTO userlinks (username, url) VALUES (?, ?)';
-      client.execute(query2, [req.user.username, uri],
-                          cql.types.consistencies.one, function (err) {
-        if (err) {console.log(err);}
-        else { document.write("Link saved!");
-          res.redirect('/pages/'+ (req.user.username));}
-      });
-  }
-  else {
-    res.render('front.jade') // what to do if not logged in ??? 
-  }
-});
+app.get('/', home);
 
-app.post('/', function(req, res) {
-  if(req.body.addFollower) {
-    var query = 'UPDATE users SET followers = followers + {?} WHERE username=?';
-    var params = [req.body.addFollower, req.user.username];
-    client.execute(query, params, cql.types.consistencies.one, function (err) {
-      if(err) {console.log(err);}
-      else {
-        query = 'UPDATE users SET followees = followees + {?} WHERE username=?';
-        params = [req.user.username, req.body.addFollower];
-        client.execute(query, params, cql.types.consistencies.one, function(err) {
-          if(err) {console.log(err);}
-        });
-        res.redirect('/');
-      }
-    });
-  }
+app.post('/addFollower', followers.addFollower);
 
-  if(req.body.removeFollower) {
-    var query1 = 'UPDATE users SET followers = followers - {?} WHERE username=?';
-    var params1 = [req.body.removeFollower, req.user.username];
-    client.execute(query1, params1, cql.types.consistencies.one, function (err) {
-      if(err) {console.log(err);}
-      else {
-        query1 = 'UPDATE users SET followees = followees - {?} WHERE username=?';
-        params1 = [req.user.username, req.body.removeFollower];
-        client.execute(query1, params1, cql.types.consistencies.one, function(err) {
-          if(err) {console.log(err);}
-        });
-        res.redirect('/');
-      }
-    });
-  }
+app.post('/removeFollower', followers.removeFollower);
 
-  if (req.body.addLink) {
-    var query2 = 'INSERT INTO userlinks (username, url) VALUES (?, ?)';
-    client.execute(query2, [req.user.username, req.body.addLink],
-                          cql.types.consistencies.one, function (err) {
-      if (err) {console.log(err);}
-      else {res.redirect('/');}
-    });
-  }
-});
-app.get('/pages/:name', function(req, res) {
-  var query = 'SELECT * FROM userlinks WHERE username=?';
-  client.executeAsPrepared(query, [req.params.name], 
-                           cql.types.consistencies.one, function (err, links) {
-    if (err) {
-      res.send('Error occurred: ' + err);
-    }
-    else {
-      res.render('profile.jade', { links: links.rows,
-                                   user: req.user });
-    }
-  });
-});
+app.post('/addLink', followers.addLink);
+
+app.get('/pages/:email', pages);
+
+// Redirect the user to Facebook for authentication.  When complete,
+// Facebook will redirect the user back to the application at
+//     /auth/facebook/callback
+app.get('/auth/facebook',
+  passport.authenticate('facebook'));
+
+// Facebook will redirect the user to this URL after approval.  Finish the
+// authentication process by attempting to obtain an access token.  If
+// access was granted, the user will be logged in.  Otherwise,
+// authentication has failed.
+app.get('/auth/facebook/callback',
+  passport.authenticate('facebook', { successRedirect: '/',
+                                      failureRedirect: '/login' }));
 
 app.get('/login', function(req, res) {
   var errors = req.flash();
@@ -229,7 +122,7 @@ app.get('/login', function(req, res) {
   }
   res.render('login.jade', { flash: results });
 });
-app.post('/login', 
+app.post('/login',
   passport.authenticate('local', { successRedirect: '/',
                                    failureRedirect: '/login',
                                    failureFlash: true }));
@@ -238,11 +131,11 @@ app.get('/logout', function(req, res) {
   res.redirect('/');
 });
 app.post('/signup', function(req, res) {
-  var query = 'INSERT INTO users (username, password) values (?, ?)';
-  client.executeAsPrepared(query, [req.body.username, req.body.password],
-                            cql.types.consistencies.one, function (err) {
+  var user_id = cql.types.uuid();
+  var query = 'INSERT INTO users (user_id, email, password) values (?,?,?)';
+  var params = [user_id, req.body.email, req.body.password];
+  client.executeAsPrepared(query, params, cql.types.consistencies.one, function (err) {
     if (err) {
-      // Do something better here
       console.log(err);
     }
     else {
