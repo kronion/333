@@ -310,7 +310,7 @@ hr {
 }
 
 /*----------------------------------------------------------------------------*/
-/* Login form                                                                 */
+/* Newsfeed                                                                   */
 /*----------------------------------------------------------------------------*/
 .feed {
   display: block;
@@ -323,9 +323,73 @@ hr {
 }
 
 /*----------------------------------------------------------------------------*/
+/* Signup form                                                                */
+/*----------------------------------------------------------------------------*/
+#signup {
+  label {
+    display: inline-block;
+    width: 35%;
+    margin-right: 15px;
+
+    text-align: right;
+  }
+  input {
+    width: 50%;
+  }
+
+  &> input {
+    width: 50%;
+    margin-left: 25%;
+    margin-top: 10px;
+  }
+}
+
+.tag() {
+  display: none;
+  position: absolute;
+
+  left: 90%;
+
+  padding: 8px;
+
+  color: #fff;
+  background-color: @red-secondary;
+  .box-shadow-secondary;
+
+  white-space: nowrap;
+
+  &:before {
+    content: ' ';
+
+    position: absolute;
+
+    top: 2px;
+    left: -24px;
+    
+    border: 15px solid transparent;
+    border-right-color: @red-secondary;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+#emailmatch {
+  .tag;
+  top: 225px;
+}
+
+#passmatch {
+  .tag;
+  top: 333px;
+}
+
+/*----------------------------------------------------------------------------*/
 /* Login form                                                                 */
 /*----------------------------------------------------------------------------*/
 .bounding-box {
+  position: relative;
   width: 100%;
 
   margin-top: 80px;
@@ -341,22 +405,25 @@ hr {
 }
 
 .button-align {
-  width: 220px;
   text-align: center;
 
   input {
     width: initial;
+    display: inline;
   }
-}
 
-.button-align > p {
-  .no-margins;
-  display: inline;
-  line-height: 34px;
-}
+  &> p {
+    .no-margins;
+    display: inline;
+    line-height: 34px;
+  }
 
-.button-align > button, input {
-  display: inline;
+  &> form {
+    display: inline;
+    &> input {
+      width: 90px;
+    }
+  }
 }
 
 /*----------------------------------------------------------------------------*/

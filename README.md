@@ -26,3 +26,4 @@ The `node_modules` directory has not been committed. To install dependencies, si
   * Use QUORUM, must set this up
   * Add check to make sure username doesn't already exist
 * (4/5) Gruntfile is broken?
+* (4/24) Log user in after creation
