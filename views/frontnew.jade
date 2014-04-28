@@ -3,50 +3,47 @@ html(lang='en')
 	head
 		include base_head
 		script(src="js/jquery-1.10.2.min.js")
-		script(script src="js/front.js")
+		script(src="js/front.js")
 		
-		body
-			include flash
-			include scripts
+	body
+		include flash
+		include scripts
 
 
-			div.login_popup
-				a.button.button-primary.button-front(href='#' style='float:right;').
-					Login
-				div.popup
-					a.close(href="#" style="float:right;").
-						X
-					form(style="text-align:center;")
-						h2(style='font-size: 50px').
-							Log In
-						form(action='/login' method='post')
-							p
-								span.title
-								input(name="username" type="text" placeholder='username' autofocus=true required=true)
-							p
-								span.title
-								input(name="password" placeholder="password" required=true type="password")
-							p
-								input.pure-button.button-primary.input(name="" type="button" value="Login")
-			div.overlay
-			div.info
-				div.leftside
-					div.intro
-						h1(style='font-size:70px').
-							NAME OF SITE
-						p(style='font-size:30px').
-							NAME OF SITE allows you to store and share the links that you care about.
-
-				div.rightside
-					div.signup
-						h1.
-							Sign Up Here!
-						form.pure-form(action='/signup' method='post' style="text-align:center")
-							p
-								input(type='text' name='firstname' placeholder='First Name' required=true)
-							p
-								input(type='text' name='lastname' placeholder='Last Name' required=true)
-							p
-								input(type='text' name='email' placeholder='Email Address' required=true)
-							p
-								input.pure-button.button-primary.input(type='submit' value='Submit')
+		div.login_popup
+			a.button.button-primary.button-front(href='#' style='float:right;') Login
+			div.popup
+				a.close(href="#" style="float:right;") X
+				form(style="text-align:center;")
+					h2(style='font-size: 50px').
+						Log In
+					form(action='/login' method='post')
+						p
+							span.title
+							input(name="username" type="text" placeholder='username' autofocus=true required=true)
+						p
+							span.title
+							input(name="password" placeholder="password" required=true type="password")
+						p
+							input.pure-button.button-primary.input(name="" type="button" value="Login")
+		div.overlay
+		div.info
+			div.leftside
+				div.intro
+					h1(style='font-size:70px').
+						NAME OF SITE
+					p(style='font-size:30px').
+						NAME OF SITE allows you to store and share the links that you care about.
+			div.rightside
+				div.signup
+					h1.
+						Sign Up Here!
+					form.pure-form(action='/signup' method='post' style="text-align:center")
+						p
+							input(type='text' name='firstname' placeholder='First Name' required=true)
+						p
+							input(type='text' name='lastname' placeholder='Last Name' required=true)
+						p
+							input(type='text' name='email' placeholder='Email Address' required=true)
+						p
+							input.pure-button.button-primary.input(type='submit' value='Submit')
