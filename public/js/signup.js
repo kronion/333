@@ -32,7 +32,10 @@ $('#signup').submit(function(e) {
         wrongPasswords();
       }
       else if (response.value === 3) {
-        window.location.href = '/';
+        $.post('/login', { email: values['email'],
+                           password: values['password'] }, function() {
+          window.location.href = '/';
+        });
       }
       // Else flash?
     });
