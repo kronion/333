@@ -82,6 +82,7 @@ app.locals({
   flash: {}
 });
 
+
 /* Routing */
 var home = require('./routes/home.js')(client, cql);
 var followers = require('./routes/followers.js')(client, cql);
@@ -129,16 +130,32 @@ app.get('/logout', function(req, res) {
   req.logout();
   res.redirect('/');
 });
+
+app.get('/signup', function(req, res) {
+  res.render('signup.jade');
+});
+
 app.post('/signup', function(req, res) {
   var user_id = cql.types.uuid();
-  var query = 'INSERT INTO users (user_id, email, password) values (?,?,?)';
-  var params = [user_id, req.body.email, req.body.password];
+  var query = 'INSERT INTO users (user_id, email, first_name, last_name, password) values (?,?,?,?,?)';
+  var params = [user_id, req.body.email, req.body.first_name, req.body.last_name, 
+                req.body.password];
+  var response = {};
+  if (req.body.email !== req.body.email2) {
+    response.value=1;
+    res.send(response);
+  }
+  else if (req.body.password !== req.body.password2) {
+    response.value=2;
+    res.send(response);
+  }
   client.executeAsPrepared(query, params, cql.types.consistencies.one, function (err) {
     if (err) {
       console.log(err);
     }
     else {
-      res.redirect('/');
+      response.value=3;
+      res.send(response);
     }
   });
 });
