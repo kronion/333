@@ -36,6 +36,12 @@ var credentials = {
 var express = require('express');
 var app = express();
 
+var busboy = require('connect-busboy');
+var Uploader = require('s3-upload-stream').Uploader;
+var s3creds = require('./s3creds.js');
+
+app.use(busboy());
+
 /* Our VPS is behind a reverse proxy */
 app.enable('trust proxy');
 
@@ -82,7 +88,6 @@ app.locals({
   flash: {}
 });
 
-
 /* Routing */
 var home = require('./routes/home.js')(client, cql);
 var followers = require('./routes/followers.js')(client, cql);
@@ -96,7 +101,7 @@ app.post('/removeFollower', followers.removeFollower);
 
 app.post('/addLink', followers.addLink);
 
-app.get('/pages/:email', pages);
+app.get('/pages/:user_id', pages);
 
 // Redirect the user to Facebook for authentication.  When complete,
 // Facebook will redirect the user back to the application at
@@ -158,6 +163,58 @@ app.post('/signup', function(req, res) {
       res.send(response);
     }
   });
+});
+
+app.post('/upload/image/:user_id', function (req, res) {
+  // Check that the post request was made by the user it affects
+  if (req.user.user_id !== req.params.user_id) {
+    // I think this will just stop fraudulent requests cold?
+    res.end();
+  }
+  else {
+    req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
+      // Check that the user posted an appropriate photo
+      if (mimetype !== 'image/gif' && mimetype !== 'image/jpeg' &&
+          mimetype !== 'image/png') {
+        // Again, clobber fraudulent requests
+        res.end();
+      }
+      else {
+        var UploadStreamObject = new Uploader(
+          s3creds,
+          {
+            'Bucket': 'chive',
+            'Key': req.user.user_id,
+            'ACL': 'public-read'
+          },
+          function (err, uploadStream) {
+            if (err) {
+              console.log(err, uploadStream);
+            }
+            else {
+              uploadStream.on('uploaded', function (data) {
+                var query = 'UPDATE users SET image=? WHERE user_id=?';
+                var params = [data.Location, req.params.user_id];
+                client.executeAsPrepared(query, params, cql.types.consistencies.one,
+                                         function (err) {
+                  if (err) {
+                    console.log(err);
+                  }
+                });
+              });
+              file.pipe(uploadStream);
+            }
+          }
+        );
+      }
+    });
+    req.busboy.on('finish', function() {
+      var response = {};
+      res.writeHead(303, { Connection: 'close', Location: '/' });
+      res.end();
+    });
+    req.pipe(req.busboy);
+  }
 });
 
 /* Create HTTP and HTTPS servers with Express object */

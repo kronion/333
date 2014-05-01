@@ -26,4 +26,6 @@ The `node_modules` directory has not been committed. To install dependencies, si
   * Use QUORUM, must set this up
   * Add check to make sure username doesn't already exist
 * (4/5) Gruntfile is broken?
-* (4/24) Log user in after creation
+* (4/28) IMPORTANT!!!! Create unique ID for each user IN ADDITION TO user_id. Using user_id on the frontend is a security vulnerability.
+  * Hold up, this could be wrong
+* (4/29) We need a page for failed searches, or a 404 page for pages that aren't found

@@ -9,10 +9,11 @@ CREATE TABLE IF NOT EXISTS users (
   email text,
   password text,
   first_name text,
-  last_name text
+  last_name text,
+  image text
 );
 
-CREATE INDEX users_email ON users (email);
+CREATE INDEX IF NOT EXISTS users_email ON users (email);
 
 CREATE TABLE IF NOT EXISTS followers (
   user_id uuid,

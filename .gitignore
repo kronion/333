@@ -1,10 +1,15 @@
 # Ignoring node_modules and keeping dependencies with 'npm shrinkwrap'
 node_modules
-keyfile.js
-*.swp
 
 # HTTPS
 server.key
 server.csr
 server.crt
 pem_key
+
+#AWS Credentials
+s3creds.js
+
+keyfile.js
+*.swp
+.DS_Store
