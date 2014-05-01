@@ -36,10 +36,14 @@ var credentials = {
 var express = require('express');
 var app = express();
 
+/* S3 and multipart form data */
 var busboy = require('connect-busboy');
 var Uploader = require('s3-upload-stream').Uploader;
-var s3creds = require('./s3creds.js');
-
+var uploadCreds = require('./uploadCreds.js');
+var knox = require('knox');
+// I hate this solution
+var deleteCreds = require('./deleteCreds.js');
+var knoxclient = knox.createClient(deleteCreds);
 app.use(busboy());
 
 /* Our VPS is behind a reverse proxy */
@@ -180,11 +184,34 @@ app.post('/upload/image/:user_id', function (req, res) {
         res.end();
       }
       else {
+        // Delete old image if it exists
+        var query = 'SELECT image FROM users WHERE user_id=?';
+        var params = [req.params.user_id];
+        client.executeAsPrepared(query, params, cql.types.consistencies.one,
+                                 function (err, result) {
+          if (err) {
+            console.log(err);
+          }
+          else {
+            var image = result.rows[0].image;
+            if (image) {
+              knoxclient.deleteFile(image.substring(image.indexOf('/', 8)),
+                                    function (err, res) {
+                if (err) {
+                  console.log(err);
+                }
+                else {
+                  res.resume();
+                }
+              });
+            }
+          }
+        });
         var UploadStreamObject = new Uploader(
-          s3creds,
+          uploadCreds,
           {
             'Bucket': 'chive',
-            'Key': req.user.user_id,
+            'Key': req.user.user_id + Math.round(Math.random() * 1000000),
             'ACL': 'public-read'
           },
           function (err, uploadStream) {

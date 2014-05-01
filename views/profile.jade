@@ -5,10 +5,9 @@ html(lang="en")
   body
     include banner
     div.content
-      div
-        img(src=image)
+      div#prof-pic(style='background-image: url(#{image})')
       form(enctype='multipart/form-data' action='/upload/image/#{user.user_id}' method='post')
-        input#image-file(type='file' name='filefield')
+        input(type='file' name='filefield')
         input(type='submit' value='Submit')
       each link in links
         p= link

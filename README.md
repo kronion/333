@@ -29,3 +29,4 @@ The `node_modules` directory has not been committed. To install dependencies, si
 * (4/28) IMPORTANT!!!! Create unique ID for each user IN ADDITION TO user_id. Using user_id on the frontend is a security vulnerability.
   * Hold up, this could be wrong
 * (4/29) We need a page for failed searches, or a 404 page for pages that aren't found
+* (5/1) Default image, save only one of them

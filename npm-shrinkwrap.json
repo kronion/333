@@ -2,35 +2,6 @@
   "name": "333_Project",
   "version": "0.0.1",
   "dependencies": {
-    "aws-sdk": {
-      "version": "2.0.0-rc.14",
-      "from": "aws-sdk@",
-      "resolved": "https://registry.npmjs.org/aws-sdk/-/aws-sdk-2.0.0-rc.14.tgz",
-      "dependencies": {
-        "aws-sdk-apis": {
-          "version": "2.0.7",
-          "from": "aws-sdk-apis@2.x",
-          "resolved": "https://registry.npmjs.org/aws-sdk-apis/-/aws-sdk-apis-2.0.7.tgz"
-        },
-        "xml2js": {
-          "version": "0.2.4",
-          "from": "xml2js@0.2.4",
-          "resolved": "https://registry.npmjs.org/xml2js/-/xml2js-0.2.4.tgz",
-          "dependencies": {
-            "sax": {
-              "version": "0.6.0",
-              "from": "sax@>=0.4.2",
-              "resolved": "https://registry.npmjs.org/sax/-/sax-0.6.0.tgz"
-            }
-          }
-        },
-        "xmlbuilder": {
-          "version": "0.4.2",
-          "from": "xmlbuilder@0.4.2",
-          "resolved": "https://registry.npmjs.org/xmlbuilder/-/xmlbuilder-0.4.2.tgz"
-        }
-      }
-    },
     "cheerio": {
       "version": "0.15.0",
       "from": "cheerio@0.15.0",
@@ -111,6 +82,51 @@
         "lodash": {
           "version": "2.4.1",
           "from": "lodash@~2.4.1"
+        }
+      }
+    },
+    "connect-busboy": {
+      "version": "0.0.1",
+      "from": "connect-busboy@",
+      "resolved": "https://registry.npmjs.org/connect-busboy/-/connect-busboy-0.0.1.tgz",
+      "dependencies": {
+        "busboy": {
+          "version": "0.2.5",
+          "from": "busboy@*",
+          "dependencies": {
+            "dicer": {
+              "version": "0.2.3",
+              "from": "dicer@0.2.3",
+              "dependencies": {
+                "streamsearch": {
+                  "version": "0.1.2",
+                  "from": "streamsearch@0.1.2"
+                }
+              }
+            },
+            "readable-stream": {
+              "version": "1.1.13-1",
+              "from": "readable-stream@1.1.x",
+              "dependencies": {
+                "core-util-is": {
+                  "version": "1.0.1",
+                  "from": "core-util-is@~1.0.0"
+                },
+                "isarray": {
+                  "version": "0.0.1",
+                  "from": "isarray@0.0.1"
+                },
+                "string_decoder": {
+                  "version": "0.10.25-1",
+                  "from": "string_decoder@~0.10.x"
+                },
+                "inherits": {
+                  "version": "2.0.1",
+                  "from": "inherits@~2.0.1"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -377,6 +393,10 @@
         }
       }
     },
+    "image-size": {
+      "version": "0.2.3",
+      "from": "image-size@"
+    },
     "jade": {
       "version": "1.3.1",
       "from": "jade@1.3.1",
@@ -557,6 +577,58 @@
                 "uglify-to-browserify": {
                   "version": "1.0.2",
                   "from": "uglify-to-browserify@~1.0.0"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "knox": {
+      "version": "0.8.9",
+      "from": "knox@",
+      "dependencies": {
+        "mime": {
+          "version": "1.2.11",
+          "from": "mime@*"
+        },
+        "xml2js": {
+          "version": "0.2.8",
+          "from": "xml2js@0.2.x",
+          "dependencies": {
+            "sax": {
+              "version": "0.5.8",
+              "from": "sax@0.5.x"
+            }
+          }
+        },
+        "debug": {
+          "version": "0.7.4",
+          "from": "debug@~0.7.0"
+        },
+        "stream-counter": {
+          "version": "0.1.0",
+          "from": "stream-counter@~0.1.0",
+          "dependencies": {
+            "readable-stream": {
+              "version": "1.0.27-1",
+              "from": "readable-stream@~1.0.2",
+              "dependencies": {
+                "core-util-is": {
+                  "version": "1.0.1",
+                  "from": "core-util-is@~1.0.0"
+                },
+                "isarray": {
+                  "version": "0.0.1",
+                  "from": "isarray@0.0.1"
+                },
+                "string_decoder": {
+                  "version": "0.10.25-1",
+                  "from": "string_decoder@~0.10.x"
+                },
+                "inherits": {
+                  "version": "2.0.1",
+                  "from": "inherits@~2.0.1"
                 }
               }
             }
@@ -761,6 +833,32 @@
         "aws-sign2": {
           "version": "0.5.0",
           "from": "aws-sign2@~0.5.0"
+        }
+      }
+    },
+    "s3-upload-stream": {
+      "version": "0.2.0",
+      "from": "s3-upload-stream@",
+      "dependencies": {
+        "aws-sdk": {
+          "version": "1.18.0",
+          "from": "aws-sdk@1.18.0",
+          "dependencies": {
+            "xml2js": {
+              "version": "0.2.4",
+              "from": "xml2js@0.2.4",
+              "dependencies": {
+                "sax": {
+                  "version": "0.6.0",
+                  "from": "sax@>=0.4.2"
+                }
+              }
+            },
+            "xmlbuilder": {
+              "version": "0.4.2",
+              "from": "xmlbuilder@0.4.2"
+            }
+          }
         }
       }
     }

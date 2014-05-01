@@ -5,7 +5,7 @@ module.exports = function(client, cql) {
     client.executeAsPrepared(query, params, cql.types.consistencies.one, 
                              function(err, result) {
       if(err) {
-        console.log(err);
+        // console.log(err);
         // Should redirect to a search page
         res.redirect('/');
       }
@@ -41,7 +41,6 @@ module.exports = function(client, cql) {
               }
               else {
                 var image = result.rows[0].image;
-                console.log(image);
 
                 // Do something more resilient here
                 var editable = false;

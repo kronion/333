@@ -8,7 +8,8 @@ server.crt
 pem_key
 
 #AWS Credentials
-s3creds.js
+uploadCreds.js
+deleteCreds.js
 
 keyfile.js
 *.swp
