@@ -40,17 +40,24 @@ module.exports = function(client, cql) {
                 console.log(err);
               }
               else {
-                var image = result.rows[0].image;
+                var row = result.rows[0];
+                if (!row) {
+                  // Should redirect to a search page
+                  res.redirect('/');
+                }
+                else {
+                  var image = row.image;
 
-                // Do something more resilient here
-                var editable = false;
-                if (req.user.user_id === req.params.user_id) editable = true;
-                  res.render('profile.jade', { user: req.user, 
-                                               editable: editable,
-                                               image: image,
-                                               links: links, 
-                                               image_sources: image_sources
-                });
+                  // Do something more resilient here
+                  var editable = false;
+                  if (req.user.user_id === req.params.user_id) editable = true;
+                    res.render('profile.jade', { user: req.user, 
+                                                 editable: editable,
+                                                 image: image,
+                                                 links: links, 
+                                                 image_sources: image_sources
+                  });
+                }
               }
             });
           }

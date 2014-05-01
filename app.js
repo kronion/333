@@ -32,6 +32,9 @@ var credentials = {
   passphrase: pem_key
 };
 
+/* Large string variables */
+var strings = require('./strings.js');
+
 /* Express */
 var express = require('express');
 var app = express();
@@ -146,9 +149,9 @@ app.get('/signup', function(req, res) {
 
 app.post('/signup', function(req, res) {
   var user_id = cql.types.uuid();
-  var query = 'INSERT INTO users (user_id, email, first_name, last_name, password) values (?,?,?,?,?)';
-  var params = [user_id, req.body.email, req.body.first_name, req.body.last_name, 
-                req.body.password];
+  var query = 'INSERT INTO users (user_id, email, first_name, image, last_name, password) values (?,?,?,?,?,?)';
+  var params = [user_id, req.body.email, req.body.first_name, strings.anonymous,
+                req.body.last_name, req.body.password];
   var response = {};
   if (req.body.email !== req.body.email2) {
     response.value=1;
@@ -194,7 +197,7 @@ app.post('/upload/image/:user_id', function (req, res) {
           }
           else {
             var image = result.rows[0].image;
-            if (image) {
+            if (image && image !== strings.anonymous) {
               knoxclient.deleteFile(image.substring(image.indexOf('/', 8)),
                                     function (err, res) {
                 if (err) {
