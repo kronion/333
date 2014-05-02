@@ -32,7 +32,7 @@ module.exports = function(client, cql) {
               image_sources[i] = rows[i].img_url;
             }
 
-            query = 'SELECT image FROM users WHERE user_id=?';
+            query = 'SELECT first_name, last_name, image FROM users WHERE user_id=?';
             params = [req.params.user_id];
             client.executeAsPrepared(query, params, cql.types.consistencies.one,
                                      function (err, result) {
@@ -47,15 +47,22 @@ module.exports = function(client, cql) {
                 }
                 else {
                   var image = row.image;
+                  var name = { first_name: row.first_name,
+                               last_name: row.last_name };
 
                   // Do something more resilient here
                   var editable = false;
-                  if (req.user.user_id === req.params.user_id) editable = true;
-                    res.render('profile.jade', { user: req.user, 
-                                                 editable: editable,
-                                                 image: image,
-                                                 links: links, 
-                                                 image_sources: image_sources
+                  if (req.user) {
+                    if (req.user.user_id === req.params.user_id) {
+                      editable = true;
+                    }
+                  }
+                  res.render('profile.jade', { user: req.user, 
+                                               editable: editable,
+                                               name: name,
+                                               image: image,
+                                               links: links, 
+                                               image_sources: image_sources
                   });
                 }
               }

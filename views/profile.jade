@@ -6,13 +6,15 @@ html(lang="en")
     include banner
     div.content
       div#prof-pic(style='background-image: url(#{image})')
-        div.fileUpload
-          div
-            span.fui-photo
-            span Edit profile photo
-          form(enctype='multipart/form-data' action='/upload/image/#{user.user_id}' method='post')
-            input.upload(type='file' name='filefield' onchange='this.form.submit()')
-      div
+        if editable
+          div.fileUpload
+            div
+              span.fui-photo
+              span Edit profile photo
+            form#prof-upload(enctype='multipart/form-data' action='/upload/image/#{user.user_id}' method='post')
+              input.upload(type='file' name='filefield' onchange='change_async()')
+      div.panel
+        h1 #{name.first_name} #{name.last_name}
       each link in links
         p= link
       each source in image_sources

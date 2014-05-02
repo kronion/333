@@ -230,6 +230,9 @@ app.post('/upload/image/:user_id', function (req, res) {
                   if (err) {
                     console.log(err);
                   }
+                  else {
+                    res.send(data.Location);
+                  }
                 });
               });
               file.pipe(uploadStream);
@@ -237,11 +240,6 @@ app.post('/upload/image/:user_id', function (req, res) {
           }
         );
       }
-    });
-    req.busboy.on('finish', function() {
-      var response = {};
-      res.writeHead(303, { Connection: 'close', Location: '/' });
-      res.end();
     });
     req.pipe(req.busboy);
   }
