@@ -9,7 +9,7 @@ module.exports = function(client, cql) {
       }
       else {
         var user_id = result.rows[0].user_id;
-        query = 'SELECT url FROM user_links WHERE user_id=?';
+        query = 'SELECT * FROM user_links WHERE user_id=?';
         params = [user_id];
         client.executeAsPrepared(query, params, cql.types.consistencies.one, 
                                  function(err, result) {
@@ -18,31 +18,18 @@ module.exports = function(client, cql) {
           }
           else {
             var rows = result.rows;
-            var links = [];
-
-            for (var i = 0; i < rows.length; i++) {
-              links[i] = rows[i].url;
+            var json = [];
+            if (rows) {
+              for (var i = 0; i < rows.length; i++) {
+                var dict = {};
+                dict.url = rows[i].url;
+                dict.image = rows[i].img_url;
+                dict.descrip = rows[i].descrip;
+                json[i] = dict;
+              }
             }
-
-            query = 'SELECT img_url FROM user_links WHERE user_id=?';
-            params = [user_id];
-            client.executeAsPrepared(query, params, cql.types.consistencies.one, 
-                                     function(err, result) {
-              if(err) {
-                console.log(err);
-              }
-              else {
-                rows= result.rows;
-                var image_sources = [];
-
-                for (i = 0; i < rows.length; i++) {
-                  image_sources[i] = rows[i].img_url;
-                }
-                res.render('profile.jade', { user: req.user, 
-                                             links: links, 
-                                             image_sources: image_sources
-                });
-              }
+            res.render('profile.jade', { user: req.user,
+                                         json: json
             });
           }
         });

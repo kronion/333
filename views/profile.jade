@@ -5,8 +5,8 @@ html(lang="en")
   body
     include banner
     div.content
-      each link in links
-        p= link
-      each source in image_sources
-        img(src = source, height='42', width='42')
+      each item in json
+        p= item.url
+        img(src = item.image, height='400', width='400')
+        p= item.descrip
     include page_scripts

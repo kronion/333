@@ -9,6 +9,7 @@ module.exports = function(client, cql) {
       var links = [];
       var image_sources = [];
       var timedecay = [];
+      var json = [];
       client.executeAsPrepared(query, params, cql.types.consistencies.one, 
                                function(err, result) {
         if (err) {
@@ -18,6 +19,12 @@ module.exports = function(client, cql) {
           var rows = result.rows;
           if (rows) {
             for (var i = 0; i < rows.length; i++) {
+              var dict = {};
+              dict.id = rows[i].user_link_id;
+              dict.url = rows[i].url;
+              dict.image = rows[i].img_url;
+              dict.descrip = rows[i].descrip;
+              json[i] = dict;
               links[i] = rows[i].url;
               image_sources[i] = rows[i].img_url;
             }
@@ -45,8 +52,7 @@ module.exports = function(client, cql) {
               }
             });
             res.render('home.jade', { user: req.user, 
-                                      links: links, 
-                                      image_sources: image_sources
+                                      json: json
             });
           }
         }

@@ -67,7 +67,14 @@ module.exports = function (client, cql) {
     });
   };
   var addLink = function (req, res) {
-    var url = req.body.addLink;
+    console.log(JSON.stringify(req.body));
+    var url;
+    if (req.body.url) {
+      url = req.body.url;
+    }
+    else {
+      url = req.body.addLink;
+    }
     var query = 'SELECT link_id FROM url_to_links WHERE url=?';
     var params = [url];
     client.executeAsPrepared(query, params, cql.types.consistencies.one, 
@@ -105,7 +112,7 @@ module.exports = function (client, cql) {
                   client.execute(query, params, cql.types.consistencies.one, 
                                  function(err) {
                     if (err) {
-                      console.log(error);
+                      console.log(err);
                     }
                     else {
                       query = 'SELECT * FROM followees WHERE user_id = ?';
@@ -146,8 +153,16 @@ module.exports = function (client, cql) {
           scraper(url, function(json) {
             var link_id = cql.types.timeuuid();
             var user_link_id = cql.types.timeuuid();
-            var img_url = json.og.image;
-            var descrip = json.og.description;
+            var img_url = 'http://www.aof-clan.com/AoFWiki/images/6/60/No_Image_Available.png';
+            var descrip = 'No description available';
+            if (json.og) {
+              if (json.og.image) {
+                img_url = json.og.image;
+              }
+              if (json.og.description) {
+                descrip = json.og.description+"...";
+              }
+            }
 
             var queries = [
               {
