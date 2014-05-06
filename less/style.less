@@ -546,6 +546,52 @@ hr {
 }
 
 /*----------------------------------------------------------------------------*/
+/* Main Content for Standard Page                                             */
+/*----------------------------------------------------------------------------*/
+
+.center-standard-page {
+  background-color: white;
+
+  height: 560px;
+  width: 960px;
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-top: -280px;
+  margin-left: -480px;
+
+  .box-shadow-primary;
+  border-radius: 0px;
+  color: black;
+
+  font-family: 'Roboto Condensed', 'Helvetica', 'Arial', 'sans-serif';
+}
+
+.sp-padding {
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-botton: 10px;
+
+  a {
+    color: @red-secondary;
+    &:hover {
+      color: @red-primary;
+    }
+  }
+
+  h1 {
+    color: @red-primary;
+    text-align: center;
+  }
+}
+
+.question {
+  color: @red-secondary;
+}
+
+/*----------------------------------------------------------------------------*/
 /* Flash messages                                                             */
 /*----------------------------------------------------------------------------*/
 .error {
