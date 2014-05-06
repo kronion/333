@@ -17,7 +17,7 @@ module.exports = function(client, cql) {
         }
         else {
           var rows = result.rows;
-          if (rows) {
+          if (rows[0]) {
             for (var i = 0; i < rows.length; i++) {
               var dict = {};
               dict.id = rows[i].user_link_id;
@@ -37,7 +37,7 @@ module.exports = function(client, cql) {
               }
               else {
                 var rows = result.rows;
-                if (rows) {
+                if (rows[0]) {
                   var queue = new PriorityQueue(function(a, b) {
                     return a.timedecay - b.timedecay;
                   });

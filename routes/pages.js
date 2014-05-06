@@ -19,7 +19,7 @@ module.exports = function(client, cql) {
           else {
             var rows = result.rows;
             var json = [];
-            if (rows) {
+            if (rows[0]) {
               for (var i = 0; i < rows.length; i++) {
                 var dict = {};
                 dict.url = rows[i].url;

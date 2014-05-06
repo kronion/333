@@ -154,7 +154,7 @@ app.get('/comments/:id', function(req, res) {
     }
     else {
       var rows = result.rows;
-      if (rows) {
+      if (rows[0]) {
         for (var i = 0; i < rows.length; i++) {
           var dict = {};
           dict.author = rows[i].author;
@@ -186,7 +186,7 @@ app.post('/comments/:id', function(req, res) {
         }
         else {
           var rows = result.rows;
-          if (rows) {
+          if (rows[0]) {
             for (var i = 0; i < rows.length; i++) {
               var dict = {};
               dict.author = rows[i].author;
