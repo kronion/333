@@ -4,6 +4,8 @@ html(lang="en")
     include base_head
   body
     include banner
+
+
     div.content
       div.feed
         form.pure-form(action='/addFollower' method='post')
@@ -15,8 +17,14 @@ html(lang="en")
         form(action='/addLink' method='post')
           input(type='url' name='addLink' placeholder='AddLink Here' autofocus=true required=true)
           input(type='submit' value='Submit')
-        each link in links
-          p=link
-        each source in image_sources
-          img(src = source, height='400', width='400')
+        each item in json
+          - var user = item.first_name + ' ' + item.last_name
+          h1
+            a(href='https://localhost:8443/pages/'+item.email) #{user}
+          a(href=item.url) #{item.url}
+          a(href=item.url)
+            img(src=item.image, height='400', width='400')
+          p=item.descrip
+          div(id=item.id)
+            script(id='myScript', type='text/jsx', src='../js/comments.js')
     include scripts

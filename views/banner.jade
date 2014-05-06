@@ -2,7 +2,7 @@ div.pure-g-r.banner
   div.pure-u-3-4.banner-inner
     if user
       div.banner-nav
-        div#divide 
+        div#divide
           h4
             a(href='/') Newsfeed
           h4
@@ -18,9 +18,9 @@ div.pure-g-r.banner
       div.search
         h2.pure-hidden-phone=title
         h2.pure-hidden-desktop.pure-hidden-tablet B
-        form.pure-form.pure-hidden-mini(action='/search' method='post')
-          input.input.pure-input-1-3(type='text' name='search' placeholder='Looking for something?')
-          button.pure-button.button-primary.input(type='submit')
+        form.pure-form.pure-hidden-mini(method='post')
+          input.input.pure-input-1-3(id='autocomplete' type='text' name='search' placeholder='Looking for something?')
+          button.pure-button.button-primary.input(id='searchbutton' type='button')
             span.fui-search
       div#updates
         p Test
