@@ -67,23 +67,29 @@ module.exports = function (client, cql) {
     });
   };
   var addLink = function (req, res) {
+    /* Console logging for testing purposes.  Will delete later. */
     console.log(JSON.stringify(req.body));
+    var rows;
     var url;
-    if (req.body.url) {
-      url = req.body.url;
-    }
-    else {
+    var query;
+    var params;
+
+    /* Obtain the url from the form or from one's timeline. */
+    if (req.body.addLink) {
       url = req.body.addLink;
     }
-    var query = 'SELECT link_id FROM url_to_links WHERE url=?';
-    var params = [url];
+    else if (req.body.url) {
+      url = req.body.url;
+    }
+    query = 'SELECT link_id FROM url_to_links WHERE url=?';
+    params = [url];
     client.executeAsPrepared(query, params, cql.types.consistencies.one, 
                              function(err, result) {
       if (err) {
         console.log(err);
       }
       else {
-        var rows = result.rows;
+        rows = result.rows;
         if (rows[0]) {
           var link_id = rows[0].link_id;
           query = 'SELECT img_url, descrip FROM global_links WHERE link_id=?';
@@ -123,8 +129,8 @@ module.exports = function (client, cql) {
                           console.log(err);
                         }
                         else {
-                          var rows = result.rows;
-                          if (rows) {
+                          rows = result.rows;
+                          if (rows[0]) {
                             for (var i = 0; i < rows.length; i++) {
                               query = 'INSERT INTO timeline (user_id, user_link_id, owner_id, url, img_url, descrip) VALUES (?, ?, ?, ?, ?, ?)';
                               params = [rows[i].followee_id, user_link_id, req.user.user_id, url, img_url, descrip];
@@ -132,7 +138,7 @@ module.exports = function (client, cql) {
                                              cql.types.consistencies.one, 
                                              function(err) {
                                 if (err) {
-                                  console.log(err);
+                                  console.error(err);
                                 }
                                 else {
                                   console.log('Successfully inserted into followees timeline');
@@ -151,16 +157,42 @@ module.exports = function (client, cql) {
         }
         else {
           scraper(url, function(json) {
+
+            /* Create timeuuids for the global link and user link table. */
             var link_id = cql.types.timeuuid();
             var user_link_id = cql.types.timeuuid();
+
+            /* Set the default image and description. */
             var img_url = 'http://www.aof-clan.com/AoFWiki/images/6/60/No_Image_Available.png';
             var descrip = 'No description available';
+
+            /* Check the results of the scraper for the image and description
+               and whatever other values that one needs. */
             if (json.og) {
               if (json.og.image) {
                 img_url = json.og.image;
               }
               if (json.og.description) {
                 descrip = json.og.description+"...";
+              }
+            }
+            else if (json.twitter) {
+              if (json.twitter.image) {
+                img_url = json.twitter.image;
+              }
+              if (json.twitter.description) {
+                descrip = json.twitter.description+"...";
+              }
+            }
+            else {
+              if (json.image) {
+                /* Scraping Google.com for an image only provides the ending
+                   to the HTTP address, and therefore this image address must
+                   be appended to the url. */
+                img_url = url+json.image;
+              }
+              if (json.description) {
+                descrip = json.description+"...";
               }
             }
 
@@ -185,31 +217,30 @@ module.exports = function (client, cql) {
             client.executeBatch(queries, cql.types.consistencies.one, 
                                 function (err) {
               if (err) {
-                console.log(err);
+                console.error(err);
               }
               else {
-                var rows = result;
-                console.log('parsed and updated everything (now with user_link_ids)');
+                console.log('NEW link successfully inserted');
                 query = 'SELECT * FROM followees WHERE user_id = ?';
                 params = [req.user.user_id];
                 client.executeAsPrepared(query, params, cql.types.consistencies.one, 
                                          function (err, result) {
                   if (err) {
-                    console.log(err);
+                    console.error(err);
                   }
                   else {
-                    var rows = result.rows;
-                    if (rows) {
+                    rows = result.rows;
+                    if (rows[0]) {
                       for (var i = 0; i < rows.length; i++) {
                         query = 'INSERT INTO timeline (user_id, user_link_id, owner_id, url, img_url, descrip) VALUES (?, ?, ?, ?, ?, ?)';
                         params = [rows[i].followee_id, user_link_id, req.user.user_id, url, img_url, descrip];
                         client.executeAsPrepared(query, params, cql.types.consistencies.one, 
                                                  function(err) {
                           if (err) {
-                            console.log(err);
+                            console.error(err);
                           }
                           else {
-                            console.log('Successfully inserted into followees timeline');
+                            console.log('Followees timeline updated with NEW link');
                           }
                         });
                       }
