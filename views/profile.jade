@@ -1,20 +1,27 @@
 doctype html
 html(lang="en")
   head
-    include base_head
+    include page_head
   body
     include banner
     div.content
-      div#prof-pic(style='background-image: url(#{image})')
-        if editable
-          div.fileUpload
-            div
-              span.fui-photo
-              span Edit profile photo
-            form#prof-upload(enctype='multipart/form-data' action='/upload/image/#{user.user_id}' method='post')
-              input.upload(type='file' name='filefield' onchange='change_async()')
+      div#prof-behind
+        div#prof-pic(style='background-image: url(#{image})')
+          if editable
+            div.fileUpload
+              div
+                span.fui-photo
+                span Edit profile photo
+              form#prof-upload(enctype='multipart/form-data' action='/upload/image/#{user.user_id}' method='post')
+                input.upload(type='file' name='filefield' onchange='change_async()')
       div.panel
-        h1 #{name.first_name} #{name.last_name}
+        div.left_panel
+          h1 #{name.first_name} #{name.last_name}
+          h3 Princeton University
+          h4 Member since 10/5/92
+        div.right_panel
+          a(href='/followees/#{user.user_id}') Followees
+          a(href='/followers/#{user.user_id}') Followers
       each link in links
         p= link
       each source in image_sources

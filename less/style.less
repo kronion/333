@@ -100,6 +100,14 @@ p {
   font-family: 'sans-serif';
 }
 
+a {
+  text-decoration: none;
+  color: black;
+  &:hover {
+    color: @red-primary;
+  }
+}
+
 button {
   background-color: @red-primary;
 }
@@ -162,7 +170,7 @@ hr {
   background-color: #fff;
   .box-shadow-primary;
 
-  z-index: 1;
+  z-index: 2;
 
   .unselectable;
 }
@@ -175,14 +183,6 @@ hr {
 
   height: 100%;
   max-width: 980px;
-
-  a {
-    text-decoration: none;
-    color: black;
-    &:hover {
-      color: @red-primary;
-    }
-  }
 
   h1, h2, h3, h4, h5, h6 {
     display: inline;
@@ -329,9 +329,8 @@ hr {
 /*----------------------------------------------------------------------------*/
 /* Profile page                                                               */
 /*----------------------------------------------------------------------------*/
-#prof-pic {
-  display: block;
-  .relative;
+#prof-behind {
+  position: relative;
 
   height: 180px;
   width: 180px;
@@ -339,11 +338,22 @@ hr {
   margin-top: 30px;
   margin-left: auto;
   margin-right: auto;
-  border: 3px solid white;
+
+  background-color: #fff; 
+  .box-shadow-primary;
+
+  z-index: 1;
+}
+
+#prof-pic {
+  display: block;
+  .relative;
+
+  height: 180px;
+  width: 180px;
 
   background-position: center;
   background-size: cover;
-  .box-shadow-primary;
 
   &:hover {
     .fileUpload {
@@ -402,12 +412,33 @@ hr {
 }
 
 .panel {
+  .relative;
   display: block;
   width: 100%;
-  height: 160px;
+  height: 130px;
   background-color: #fff;
-  margin-top: -155px;
+  margin-top: -125px;
   .box-shadow-primary;
+}
+
+.left_panel {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  margin-bottom: 10px;
+  margin-left: 10px;
+}
+
+.right_panel {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  margin-bottom: 10px;
+  margin-right: 10px;
+
+  a {
+    margin-left: 10px;
+  }
 }
 
 /*----------------------------------------------------------------------------*/
