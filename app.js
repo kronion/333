@@ -32,9 +32,22 @@ var credentials = {
   passphrase: pem_key
 };
 
+/* Large string variables */
+var strings = require('./strings.js');
+
 /* Express */
 var express = require('express');
 var app = express();
+
+/* S3 and multipart form data */
+var busboy = require('connect-busboy');
+var Uploader = require('s3-upload-stream').Uploader;
+var uploadCreds = require('./uploadCreds.js');
+var knox = require('knox');
+// I hate this solution
+var deleteCreds = require('./deleteCreds.js');
+var knoxclient = knox.createClient(deleteCreds);
+app.use(busboy());
 
 /* Our VPS is behind a reverse proxy */
 app.enable('trust proxy');
@@ -82,7 +95,6 @@ app.locals({
   flash: {}
 });
 
-
 /* Routing */
 var home = require('./routes/home.js')(client, cql);
 var followers = require('./routes/followers.js')(client, cql);
@@ -96,7 +108,7 @@ app.post('/removeFollower', followers.removeFollower);
 
 app.post('/addLink', followers.addLink);
 
-app.get('/pages/:email', pages);
+app.get('/pages/:user_id', pages);
 
 // Redirect the user to Facebook for authentication.  When complete,
 // Facebook will redirect the user back to the application at
@@ -137,9 +149,9 @@ app.get('/signup', function(req, res) {
 
 app.post('/signup', function(req, res) {
   var user_id = cql.types.uuid();
-  var query = 'INSERT INTO users (user_id, email, first_name, last_name, password) values (?,?,?,?,?)';
-  var params = [user_id, req.body.email, req.body.first_name, req.body.last_name, 
-                req.body.password];
+  var query = 'INSERT INTO users (user_id, email, first_name, image, last_name, password) values (?,?,?,?,?,?)';
+  var params = [user_id, req.body.email, req.body.first_name, strings.anonymous,
+                req.body.last_name, req.body.password];
   var response = {};
   if (req.body.email !== req.body.email2) {
     response.value=1;
@@ -158,6 +170,79 @@ app.post('/signup', function(req, res) {
       res.send(response);
     }
   });
+});
+
+app.post('/upload/image/:user_id', function (req, res) {
+  // Check that the post request was made by the user it affects
+  if (req.user.user_id !== req.params.user_id) {
+    // I think this will just stop fraudulent requests cold?
+    res.end();
+  }
+  else {
+    req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
+      // Check that the user posted an appropriate photo
+      if (mimetype !== 'image/gif' && mimetype !== 'image/jpeg' &&
+          mimetype !== 'image/png') {
+        // Again, clobber fraudulent requests
+        res.end();
+      }
+      else {
+        // Delete old image if it exists
+        var query = 'SELECT image FROM users WHERE user_id=?';
+        var params = [req.params.user_id];
+        client.executeAsPrepared(query, params, cql.types.consistencies.one,
+                                 function (err, result) {
+          if (err) {
+            console.log(err);
+          }
+          else {
+            var image = result.rows[0].image;
+            if (image && image !== strings.anonymous) {
+              knoxclient.deleteFile(image.substring(image.indexOf('/', 8)),
+                                    function (err, res) {
+                if (err) {
+                  console.log(err);
+                }
+                else {
+                  res.resume();
+                }
+              });
+            }
+          }
+        });
+        var UploadStreamObject = new Uploader(
+          uploadCreds,
+          {
+            'Bucket': 'chive',
+            'Key': req.user.user_id + Math.round(Math.random() * 1000000),
+            'ACL': 'public-read'
+          },
+          function (err, uploadStream) {
+            if (err) {
+              console.log(err, uploadStream);
+            }
+            else {
+              uploadStream.on('uploaded', function (data) {
+                var query = 'UPDATE users SET image=? WHERE user_id=?';
+                var params = [data.Location, req.params.user_id];
+                client.executeAsPrepared(query, params, cql.types.consistencies.one,
+                                         function (err) {
+                  if (err) {
+                    console.log(err);
+                  }
+                  else {
+                    res.send(data.Location);
+                  }
+                });
+              });
+              file.pipe(uploadStream);
+            }
+          }
+        );
+      }
+    });
+    req.pipe(req.busboy);
+  }
 });
 
 /* Create HTTP and HTTPS servers with Express object */
