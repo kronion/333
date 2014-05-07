@@ -93,6 +93,8 @@ app.post('/addFollower', followers.addFollower);
 
 app.post('/removeFollower', followers.removeFollower);
 
+// app.post('/removeLink', followers.removeLink);
+
 app.post('/addLink', followers.addLink);
 
 app.get('/pages/:email', pages);

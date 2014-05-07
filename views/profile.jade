@@ -6,8 +6,15 @@ html(lang="en")
     include banner
     div.content
       each item in json
-        a(href=item.url) #{item.url}
-        a(href=item.url)
-          img(src = item.image, height='400', width='400')
-        p= item.descrip
+        div.linkcontainer
+          div.leftsidehome
+            h2 PUT TITLE HERE
+            a(href=item.url)
+              img(src=item.image, height='200', width='400')
+            p=item.descrip
+          div.rightsidehome
+            div(id=item.id)
+              script(id='myScript', type='text/jsx', src='../js/comments.js')
+        div.spaceinbetween
+
     include page_scripts

@@ -15,7 +15,7 @@
  *                  conventions:
  *
  *                  * Do not use the !important flag unless there is absolutely
- *                    zero alternative. 
+ *                    zero alternative.
  *
  *                  * Prefer classes to IDs, and please consider how you can
  *                    reuse the styles you create.
@@ -200,7 +200,7 @@ hr {
 
   form {
     display: inline;
-    
+
     line-height: @nav-height;
     vertical-align: middle;
 
@@ -234,7 +234,7 @@ hr {
     margin-right: 10px;
     margin-left: 10px;
   }
-  
+
   #divide {
     border-right: 2px solid #cecece;
     -webkit-border-image: -webkit-linear-gradient(transparent, #dedede, transparent);
@@ -315,11 +315,13 @@ hr {
 .feed {
   display: block;
 
-  width: 100%;
-  height: 100%;
-  
+  width: 980px;
+  height: 45px;
+
   background-color: #fff;
   .box-shadow-primary;
+
+  padding-top:10px;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -382,6 +384,67 @@ hr {
 @media (min-width:481px) {
   .pure-visible-mini {
     display: none !important;
+  }
+}
+
+/*----------------------------------------------------------------------------*/
+/* Homepage                                                                   */
+/*----------------------------------------------------------------------------*/
+
+.linkcontainer{
+  width: 980px;
+  height: 350px;
+  background-color: white;
+  .box-shadow-primary;
+
+  font-family: 'Roboto Condensed', 'Helvetica', 'Arial', 'sans-serif';
+
+  a {
+      text-decoration: none;
+      color: @red-secondary;
+      &:hover {
+        color: @red-primary;
+        text-decoration: underline;
+      }
+    }
+}
+
+.spaceinbetween {
+  height: 20px;
+}
+
+.leftsidehome {
+  padding: 5px 5px 5px 10px;
+  float: left;
+  width: 55%;
+  height: 340px;
+  border-right: 2px solid #cecece;
+  border-radius: 0px;
+}
+
+.rightsidehome {
+  padding: 5px 5px 5px 5px;
+  float: right;
+  width: 42%;
+  height: 340px;
+
+}
+
+/*----------------------------------------------------------------------------*/
+/* Formatting Comments                                                        */
+/*----------------------------------------------------------------------------*/
+
+.commentAuthor {
+  color: @red-secondary;
+}
+
+.postingNew {
+  color: black;
+
+  .input {
+    display: inline-block !important;
+    font-size: 80%;
+    margin-left: 4px !important;
   }
 }
 

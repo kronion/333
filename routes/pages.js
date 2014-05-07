@@ -2,7 +2,7 @@ module.exports = function(client, cql) {
   var pages = function(req, res) {
     var query = 'SELECT user_id FROM users WHERE email=?';
     var params = [req.params.email];
-    client.executeAsPrepared(query, params, cql.types.consistencies.one, 
+    client.executeAsPrepared(query, params, cql.types.consistencies.one,
                              function (err, result) {
       if (err) {
         console.log(err);
@@ -11,7 +11,7 @@ module.exports = function(client, cql) {
         var user_id = result.rows[0].user_id;
         query = 'SELECT * FROM user_links WHERE user_id=?';
         params = [user_id];
-        client.executeAsPrepared(query, params, cql.types.consistencies.one, 
+        client.executeAsPrepared(query, params, cql.types.consistencies.one,
                                  function(err, result) {
           if(err) {
             console.log(err);
@@ -25,6 +25,7 @@ module.exports = function(client, cql) {
                 dict.url = rows[i].url;
                 dict.image = rows[i].img_url;
                 dict.descrip = rows[i].descrip;
+                dict.id = rows[i].user_link_id;
                 json[i] = dict;
               }
             }

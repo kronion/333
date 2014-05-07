@@ -21,7 +21,7 @@ $(function() {
 
   $( "#searchbutton" ).click(
     function() {
-      var searchval = $( '#autocomplete').val()
+      var searchval = $( '#autocomplete').val();
       document.location.href = 'https://localhost:8443/pages/' + searchval;
   })
 

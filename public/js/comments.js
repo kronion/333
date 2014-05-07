@@ -7,10 +7,20 @@ var Comment = React.createClass({
     var rawMarkup = converter.makeHtml(this.props.children.toString());
     return (
       <div className="comment">
-        <h2 className="commentAuthor">{this.props.author}</h2>
+        <div className="commentAuthor">{this.props.author}</div>
         <span dangerouslySetInnerHTML={{__html: rawMarkup}} />
       </div>
     );
+  }
+});
+
+// FIND WAY TO COMBINE THIS WITH ABOVE FOR AUTHOR + COMMENT TEXT
+var CommentList = React.createClass({
+  render: function() {
+    var commentNodes = this.props.data.map(function (comment, index) {
+      return <Comment key={index} author={comment.author}>{comment.text}</Comment>;
+    });
+    return <div className="commentList">{commentNodes}</div>;
   }
 });
 
@@ -46,24 +56,13 @@ var CommentBox = React.createClass({
   render: function() {
     return (
       <div className="commentBox">
-        <h1>Comments</h1>
+        <h3>Comments</h3>
         <CommentList data={this.state.data} />
         <CommentForm onCommentSubmit={this.handleCommentSubmit} />
       </div>
     );
   }
 });
-
-var CommentList = React.createClass({
-  render: function() {
-    var commentNodes = this.props.data.map(function (comment, index) {
-      return <Comment key={index} author={comment.author}>{comment.text}</Comment>;
-    });
-    return <div className="commentList">{commentNodes}</div>;
-  }
-});
-
-
 
 var CommentForm = React.createClass({
   handleSubmit: function() {
@@ -72,11 +71,12 @@ var CommentForm = React.createClass({
     this.refs.text.getDOMNode().value = '';
     return false;
   },
+
   render: function() {
     return (
-      <form className="commentForm" onSubmit={this.handleSubmit}>
+      <form className="postingNew pure-form" onSubmit={this.handleSubmit}>
         <input type="text" placeholder="Say something..." ref="text" />
-        <input type="submit" value="Post" />
+        <input className="pure-button button-primary" type="submit" value="Post" />
       </form>
     );
   }

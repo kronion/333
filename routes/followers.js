@@ -66,6 +66,46 @@ module.exports = function (client, cql) {
       }
     });
   };
+  /*var removeLink = function(req, res) {
+    var url = req.body.removeLink;
+    var query = 'SELECT link_id FROM url_to_links WHERE url=?';
+    var params = [url];
+    client.executeAsPrepared(query, params, cql.types.consistencies.one,
+                             function(err, result) {
+      if (err) {
+        console.log(err);
+      }
+      else {
+        var rows = result.rows;
+        if (rows[0]) {
+          var link_id = rows[0].link_id;
+          var queries = [
+            {
+              query: 'DELETE FROM user_links WHERE user_id=? AND user_link_id=?',
+              params: [req.user.user_id, link_id]
+            },
+            {
+              query: 'DELETE FROM user_link_id_to_user WHERE user_link_id=?',
+              params: [link_id]
+            },
+            {
+              query: 'DELETE FROM timeline WHERE user_id=? AND user_link_id=?',
+              params: [req.user.user_id, link_id]
+            }
+          ];
+          client.executeBatch(queries, cql.types.consistencies.one, function(err) {
+            if (err) {
+              console.log(err);
+            }
+            else {
+              console.log("removed Link");
+              res.redirect('/');
+            }
+          });
+        }
+      }
+    });
+  };*/
   var addLink = function (req, res) {
     var url = req.body.addLink;
     var query = 'SELECT link_id FROM url_to_links WHERE url=?';
@@ -223,5 +263,7 @@ module.exports = function (client, cql) {
   };
   return { addLink: addLink,
            addFollower: addFollower,
-           removeFollower: removeFollower };
+           removeFollower: removeFollower,
+           //removeLink: removeLink
+         };
 };
