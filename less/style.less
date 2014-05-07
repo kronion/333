@@ -45,6 +45,9 @@
 // Navbar height
 @nav-height: 45px;
 
+// Footer height 
+@footer-height: 45px;
+
 /*----------------------------------------------------------------------------*/
 /* Mixins                                                                     */
 /*----------------------------------------------------------------------------*/
@@ -540,6 +543,168 @@ hr {
       width: 90px;
     }
   }
+}
+
+/*----------------------------------------------------------------------------*/
+/* Popup Window                                                               */
+/*----------------------------------------------------------------------------*/
+
+.button-front {
+  margin-top: 5px;
+  margin-left: 5px;
+  margin-right: 5px;
+
+  padding: 5px 10px;
+  z-index: 0;
+}
+
+.overlay {
+  z-index: 5;
+  background-color: rgba(0,0,0,.80);
+  display: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+.popup {
+  padding: 10px 10px 35px;
+  background: white;
+  color: black;
+  z-index: 999;
+  display: none;
+  position: absolute;
+
+  top:50%;
+  left:50%;
+  width:300;
+  height:300;
+  margin-left: -150px;
+  margin-top: -150px;
+  border-radius: 0px;
+}
+
+/*----------------------------------------------------------------------------*/
+/* Middle Info on frontnew.jade                                               */
+/*----------------------------------------------------------------------------*/
+
+.info {
+  background-color: white;
+  height: 440px;
+  width: 960px;
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-top: -220px;
+  margin-left: -480px;
+
+  .box-shadow-primary;
+  border-radius: 0px;
+  color: black;
+}
+
+.leftside {
+  float: left; 
+  width: 50%;
+}
+
+.rightside {
+  float: right; 
+  width: 50%;
+}
+
+.intro{
+  width: 90%;
+  margin-top: 15px;
+  margin-left: 15px;
+}
+
+.signup {
+  float: center; 
+  width: 90%;
+  margin-top: 15px;
+  margin-left: 15px;
+  font-size: 100 px;
+}
+
+/*----------------------------------------------------------------------------*/
+/* Footer                                                                     */
+/*----------------------------------------------------------------------------*/
+
+.footer-me {
+  bottom: 0;
+
+  display: block;
+  position:fixed;
+  width: 100%;
+  height:@footer-height;
+  margin-top:10px;
+  border-radius:0px;
+  background-color:white;
+  .box-shadow-primary;
+  .unselectable;
+}
+
+.footer-nav {
+  height: @footer-height;
+  text-align: center;
+
+  div {
+    display: inline-block;
+
+    height: @nav-height;
+    vertical-align: top;
+
+    margin-right: 10px;
+    margin-left: 10px;
+  }
+}
+
+/*----------------------------------------------------------------------------*/
+/* Main Content for Standard Page                                             */
+/*----------------------------------------------------------------------------*/
+
+.center-standard-page {
+  background-color: white;
+
+  height: 560px;
+  width: 960px;
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-top: -280px;
+  margin-left: -480px;
+
+  .box-shadow-primary;
+  border-radius: 0px;
+  color: black;
+
+  font-family: 'Roboto Condensed', 'Helvetica', 'Arial', 'sans-serif';
+}
+
+.sp-padding {
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-botton: 10px;
+
+  a {
+    color: @red-secondary;
+    &:hover {
+      color: @red-primary;
+    }
+  }
+
+  h1 {
+    color: @red-primary;
+    text-align: center;
+  }
+}
+
+.question {
+  color: @red-secondary;
 }
 
 /*----------------------------------------------------------------------------*/

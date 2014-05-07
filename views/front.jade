@@ -3,9 +3,56 @@ html(lang='en')
   head
     include base_head
   body
-    include banner
-    div.content
-      a(href='/signup') Sign up here
-      a(href='/auth/facebook')
-        img(src='login-with-facebook.png', width='154', height='22')
+    div.login_popup
+      a.button.button-primary.button-front(href='#' style='float:right; text-decoration: none;') Login
+      div.popup
+        a.close(href="#" style="float:right; text-decoration: none") X
+        div(style="text-align:center;")
+          h2(style='font-size: 50px').
+            Log In
+          form.pure-form(action='/login' method='post')
+            p
+              input.input(type='text' name='email' placeholder='email' autofocus=true required=true)
+            p
+              input.input(type='password' name='password' placeholder='password' required=true)
+            p
+              input.pure-button.button-primary(type="submit" value="Login")
+    div.overlay
+    div.info
+      div.leftside
+        div.intro
+          h1(style='font-size:70px').
+            NAME OF SITE
+          p(style='font-size:30px').
+            NAME OF SITE allows you to store and share the links that you care about.
+      div.rightside
+        div.signup
+          div.padded
+            h1.
+              Sign Up Here!
+            form#signup.pure-form.pure-form-aligned(action='/signup' method='post')
+              fieldset
+                label(for='first_name') First name
+                input(type='text' name='first_name' placeholder='First name' autofocus=true required=true)
+              fieldset
+                label(for='last_name') Last name
+                input(type='text' name='last_name' placeholder='Last name' required=true)
+              fieldset
+                label(for='email') Email
+                input(type='email' name='email' placeholder='Email' required=true)
+              fieldset
+                label(for='email2') Reenter email
+                input(type='email' name='email2' placeholder='Reenter email' required=true)
+              fieldset
+                label(for='password') Password
+                input(type='password' name='password' placeholder='Password' required=true)
+              fieldset
+                label(for='password2') Reenter password
+                input(type='password' name='password2' placeholder='Reenter password' required=true)
+              input.pure-button.button-primary(type='submit' value='Submit')
+          div#emailmatch
+            p Emails do not match
+          div#passmatch
+            p Passwords do not match
     include scripts
+    include scripts-signup
