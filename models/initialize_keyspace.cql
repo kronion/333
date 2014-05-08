@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS global_links (
   url text,
   img_url text,
   descrip text,
+  title text,
   count int
 );
 
@@ -45,6 +46,7 @@ CREATE TABLE IF NOT EXISTS user_links (
   url text,
   img_url text,
   descrip text,
+  title text,
   caption text,
   privacy boolean,
   PRIMARY KEY (user_id, user_link_id)
@@ -83,6 +85,7 @@ CREATE TABLE IF NOT EXISTS timeline (
   url text,
   img_url text,
   descrip text,
+  title text,
   caption text,
   PRIMARY KEY (user_id, user_link_id)
 ) WITH CLUSTERING ORDER BY (user_link_id DESC);

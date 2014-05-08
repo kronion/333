@@ -14,35 +14,43 @@ module.exports = function(url, cb) {
       var property;
       var name;
       var itemprop;
+      var title;
 
-      $('meta').each(function(i, elem) {
+      if($('meta')) {
+        $('meta').each(function(i, elem) {
 
-        /* Search for the properties attribute. This may or may not 
-           contain information for opengraph (og). */
-        property = $(elem).attr('property');
-        if (property) {
-          split_array = property.split(':');
-          splitter(split_array, elem);
-        }
+          /* Search for the properties attribute. This may or may not 
+             contain information for opengraph (og). */
+          property = $(elem).attr('property');
+          if (property) {
+            split_array = property.split(':');
+            splitter(split_array, elem);
+          }
 
-        /* Search for the name attribute.  This may or may not contain
-           information for twitter and a generic description. */
-        name = $(elem).attr('name');
-        if (name) {
-          split_array = name.split(':');
-          splitter(split_array, elem);
-        }
+          /* Search for the name attribute.  This may or may not contain
+             information for twitter and a generic description. */
+          name = $(elem).attr('name');
+          if (name) {
+            split_array = name.split(':');
+            splitter(split_array, elem);
+          }
 
-        /* Search for the itemprop attribute.  This may or may not
-           contain an image (e.g., favicon) for sites similar to 
-           Google. */
-        itemprop = $(elem).attr('itemprop');
-        if (itemprop) {
-          split_array = itemprop.split(':');
-          splitter(split_array, elem);
-        }
+          /* Search for the itemprop attribute.  This may or may not
+             contain an image (e.g., favicon) for sites similar to 
+             Google. */
+          itemprop = $(elem).attr('itemprop');
+          if (itemprop) {
+            split_array = itemprop.split(':');
+            splitter(split_array, elem);
+          }
 
-      });
+        });
+      }
+
+      title = $('title').first().text();
+      if (title) {
+        result['title'] = title;
+      }
 
       function splitter(split_array, elem) {
         var parent = result;

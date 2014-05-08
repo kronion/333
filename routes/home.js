@@ -24,6 +24,7 @@ module.exports = function(client, cql) {
               dict.url = rows[i].url;
               dict.image = rows[i].img_url;
               dict.descrip = rows[i].descrip;
+              dict.title = rows[i].title
               json[i] = dict;
               links[i] = rows[i].url;
               image_sources[i] = rows[i].img_url;
