@@ -39,7 +39,6 @@ var express = require('express');
 var app = express();
 
 /* S3 and multipart form data */
-/*
 var busboy = require('connect-busboy');
 var Uploader = require('s3-upload-stream').Uploader;
 var uploadCreds = require('./uploadCreds.js');
@@ -48,7 +47,6 @@ var knox = require('knox');
 var deleteCreds = require('./deleteCreds.js');
 var knoxclient = knox.createClient(deleteCreds);
 app.use(busboy());
-*/
 
 /* Our VPS is behind a reverse proxy */
 app.enable('trust proxy');
@@ -180,7 +178,6 @@ app.post('/signup', function(req, res) {
   });
 });
 
-/*
 app.post('/upload/image/:user_id', function (req, res) {
   // Check that the post request was made by the user it affects
   if (req.user.user_id !== req.params.user_id) {
@@ -253,27 +250,10 @@ app.post('/upload/image/:user_id', function (req, res) {
     req.pipe(req.busboy);
   }
 });
-*/
 
 /* Create HTTP and HTTPS servers with Express object */
 var httpServer = http.createServer(app);
 var httpsServer = https.createServer(credentials, app);
 httpServer.listen(8080);
 httpsServer.listen(8443);
-/*
- * =============================================================================
- *
- *      Filename:   app.js
- *
- *   Description:   Root server file, acts as the point of connection between
- *                  client and routing logic.
- *
- *       Version:   0.0.1
- *       Created:   3/5/14 3:31:18 AM
- *
- *        Author:   Collin Stedman
- *
- * =============================================================================
- */
 
-/* File system */
