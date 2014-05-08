@@ -28,8 +28,7 @@ var certificate = fs.readFileSync('server.crt', 'utf8');
 var pem_key = fs.readFileSync('pem_key', 'utf8');
 var credentials = {
   key: privateKey,
-  cert: certificate,
-  passphrase: pem_key
+  cert: certificate, passphrase: pem_key
 };
 
 /* Large string variables */
@@ -89,6 +88,9 @@ app.use(express.compress())
 /* Passport */
 var passport = require('./routes/authenticate.js')(app, client, cql);
 
+/* request */
+var request = require('request');
+
 /* Jade templating */
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -101,6 +103,7 @@ app.locals({
 var home = require('./routes/home.js')(client, cql);
 var followers = require('./routes/followers.js')(client, cql);
 var pages = require('./routes/pages.js')(client, cql);
+var bookmarklet = require('./routes/bookmarklet.js')(client, cql);
 
 app.get('/', home);
 
@@ -108,6 +111,9 @@ app.post('/addFollower', followers.addFollower);
 
 app.post('/removeFollower', followers.removeFollower);
 
+/* For bookmarklet purposes: adding a link via GET request */
+app.get('/bookmark/:uri_enc', bookmarklet);
+     
 app.post('/addLink', followers.addLink);
 
 app.get('/pages/:user_id', pages);
@@ -173,6 +179,7 @@ app.post('/signup', function(req, res) {
     }
   });
 });
+
 /*
 app.post('/upload/image/:user_id', function (req, res) {
   // Check that the post request was made by the user it affects
@@ -247,8 +254,26 @@ app.post('/upload/image/:user_id', function (req, res) {
   }
 });
 */
+
 /* Create HTTP and HTTPS servers with Express object */
 var httpServer = http.createServer(app);
 var httpsServer = https.createServer(credentials, app);
 httpServer.listen(8080);
 httpsServer.listen(8443);
+/*
+ * =============================================================================
+ *
+ *      Filename:   app.js
+ *
+ *   Description:   Root server file, acts as the point of connection between
+ *                  client and routing logic.
+ *
+ *       Version:   0.0.1
+ *       Created:   3/5/14 3:31:18 AM
+ *
+ *        Author:   Collin Stedman
+ *
+ * =============================================================================
+ */
+
+/* File system */

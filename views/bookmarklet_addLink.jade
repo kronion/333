@@ -1,0 +1,38 @@
+// var chive_url = 'https://localhost:8443/bookmark/';
+
+doctype html
+html(lang="en")
+  head
+    include base_head
+  body
+    include banner
+    div.content
+      div.feed
+        script(type='text/javascript').
+          var loc = a.location.href;
+          add_loc = loc.split("/bookmark/")[1];
+        form(action='/addLink' method='post' style='display: none')
+          input(type='url' name='addLink' value=add_loc autofocus=true required=true)
+          input(type='submit' value='Submit')
+    include scripts
+
+
+// var a=window, b=document, c=encodeURIComponent;
+
+// var loc = a.location.href;
+// add_loc = loc.split("/bookmark/")[1];
+
+// var form = b.createElement("form");
+// form.setAttribute("action", addlink_url);
+// form.setAttribute("method", "POST"); 
+// form.setAttribute("style", "display: none");
+
+// var inputURL = b.createElement("input");
+// inputURL.setAttribute("type", "url"); 
+// inputURL.setAttribute("name", "addLink");
+// inputURL.setAttribute("value", add_loc);
+// form.appendChild(inputURL);
+
+// b.body.appendChild(form);
+
+// form.submit();
