@@ -10,7 +10,9 @@ CREATE TABLE IF NOT EXISTS users (
   password text,
   first_name text,
   last_name text,
-  image text
+  image text,
+  ver_code timeuuid,
+  verified boolean
 );
 
 CREATE INDEX IF NOT EXISTS users_email ON users (email);
