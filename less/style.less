@@ -444,6 +444,37 @@ hr {
 /*----------------------------------------------------------------------------*/
 /* Signup form                                                                */
 /*----------------------------------------------------------------------------*/
+.tag() {
+  display: none;
+  position: absolute;
+
+  left: 90%;
+
+  padding: 8px;
+
+  color: #fff;
+  background-color: @red-secondary;
+  .box-shadow-secondary;
+
+  white-space: nowrap;
+
+  &:before {
+    content: ' ';
+
+    position: absolute;
+
+    top: 2px;
+    left: -24px;
+    
+    border: 15px solid transparent;
+    border-right-color: @red-secondary;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
 #signup {
   label {
     display: inline-block;
@@ -460,6 +491,21 @@ hr {
     width: 50%;
     margin-left: 25%;
     margin-top: 10px;
+  }
+
+  #emailmatch {
+    .tag;
+    top: 225px;
+  }
+
+  #passmatch {
+    .tag;
+    top: 333px;
+  }
+
+  #bademail {
+    .tag;
+    top: 171px;
   }
 }
 
@@ -631,6 +677,24 @@ hr {
   margin-top: 15px;
   margin-left: 15px;
   font-size: 100 px;
+
+  #emailmatch {
+    .tag;
+    left: 93%;
+    top: 240px;
+  }
+
+  #passmatch {
+    .tag;
+    left: 93%;
+    top: 346px;
+  }
+
+  #bademail {
+    .tag;
+    left: 93%;
+    top: 186px;
+  }
 }
 
 /*----------------------------------------------------------------------------*/

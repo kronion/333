@@ -19,10 +19,10 @@ module.exports = function(app, client, cql) {
         if (!user.rows[0]) {
           return done(null, false, { 'message': strings.incorrect_username });
         }
-        if (user.rows[0].password != password) {
+        if (user.rows[0].password !== password) {
           return done(null, false, { 'message': strings.incorrect_password });
         }
-        if (user.rows[0].verified == false) {
+        if (user.rows[0].verified === false) {
           return done(null, false, { 'message': strings.unverified });
         }
         return done(null, user.rows[0]);

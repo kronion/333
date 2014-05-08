@@ -41,17 +41,8 @@ var app = express();
 
 /* Express-Mailer */
 var mailer = require('express-mailer');
-mailer.extend(app, {
-  from: 'put your email here',
-  host: 'smtp.gmail.com',
-  secureConnection: true,
-  port: 465,
-  transportMethod: 'SMTP',
-  auth: {
-    user: 'put your email here',
-    pass:  'put your password here'
-  }
-});
+var email = require('./email.js');
+mailer.extend(app, email);
 
 /* S3 and multipart form data */
 var busboy = require('connect-busboy');
@@ -141,12 +132,12 @@ app.get('/verify/:email/:ver_code', function (req, res) {
       var rows = result.rows;
       var text;
       if (rows[0]) {
-        if (rows[0].verified == true) {
+        if (rows[0].verified === true) {
           text = 'Your account is already verified!';
           res.render('verified.jade', {text: text});
         }
         else {
-          if (rows[0].ver_code != req.params.ver_code) {
+          if (rows[0].ver_code !== req.params.ver_code) {
             text = 'Your verification code does not match!';
             res.render('verified.jade', {text: text});
           }
@@ -255,9 +246,6 @@ app.post('/signup', function(req, res) {
             }, function (err) {
               if (err) {
                 console.error(err);
-              }
-              else {
-                console.log('Email sent');
               }
             });
             response.value=3;

@@ -12,6 +12,9 @@ uploadCreds.js
 deleteCreds.js
 creds.zip
 
+# Email Credentials
+email.js
+
 keyfile.js
 *.swp
 .DS_Store
