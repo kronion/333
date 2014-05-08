@@ -3,6 +3,7 @@ html(lang='en')
   head
     include base_head
   body
+    div.backlink
     div.login_popup
       a.button.button-primary.button-front(href='#' style='float:right; text-decoration: none;') Login
       div.popup
@@ -22,14 +23,15 @@ html(lang='en')
       div.leftside
         div.intro
           h1(style='font-size:70px').
-            NAME OF SITE
+            Welcome to #{title}!
           p(style='font-size:30px').
-            NAME OF SITE allows you to store and share the links that you care about.
+            #{title} allows you to store and share the links that you care about.
       div.rightside
         div.signup
           div.padded
             h1.
               Sign Up Here!
+            hr
             form#signup.pure-form.pure-form-aligned(action='/signup' method='post')
               fieldset
                 label(for='first_name') First name
@@ -54,5 +56,6 @@ html(lang='en')
             p Emails do not match
           div#passmatch
             p Passwords do not match
+    include footer
     include scripts
-    include scripts-signup
+    include scripts-front

@@ -10,6 +10,7 @@ pem_key
 #AWS Credentials
 uploadCreds.js
 deleteCreds.js
+creds.zip
 
 keyfile.js
 *.swp

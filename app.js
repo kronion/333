@@ -91,7 +91,7 @@ var passport = require('./routes/authenticate.js')(app, client, cql);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.locals({
-  title: 'GetChive',
+  title: '\'Chive',
   flash: {}
 });
 
@@ -99,6 +99,7 @@ app.locals({
 var home = require('./routes/home.js')(client, cql);
 var followers = require('./routes/followers.js')(client, cql);
 var pages = require('./routes/pages.js')(client, cql);
+var footer = require('./routes/footer.js')();
 
 app.get('/', home);
 
@@ -109,6 +110,11 @@ app.post('/removeFollower', followers.removeFollower);
 app.post('/addLink', followers.addLink);
 
 app.get('/pages/:user_id', pages);
+
+/* Footer routes */
+app.get('/about', footer.about);
+app.get('/contact', footer.contact);
+app.get('/help', footer.help);
 
 // Redirect the user to Facebook for authentication.  When complete,
 // Facebook will redirect the user back to the application at
