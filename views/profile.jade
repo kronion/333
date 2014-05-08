@@ -8,10 +8,12 @@ html(lang="en")
       each item in json
         div.linkcontainer
           div.leftsidehome
-            h2 PUT TITLE HERE
-            a(href=item.url)
-              img(src=item.image, height='200', width='400')
-            p=item.descrip
+            center
+              h2 PUT TITLE HERE
+              a(href=item.url style="")
+                img(src=item.image, height='200', width='400')
+              p=item.descrip
+
           div.rightsidehome
             div(id=item.id)
               script(id='myScript', type='text/jsx', src='../js/comments.js')

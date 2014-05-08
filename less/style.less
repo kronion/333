@@ -361,6 +361,7 @@ hr {
   display: inline;
 }
 
+
 /*----------------------------------------------------------------------------*/
 /* Flash messages                                                             */
 /*----------------------------------------------------------------------------*/
@@ -393,7 +394,7 @@ hr {
 
 .linkcontainer{
   width: 980px;
-  height: 350px;
+  height: 400px;
   background-color: white;
   .box-shadow-primary;
 
@@ -406,6 +407,10 @@ hr {
         color: @red-primary;
         text-decoration: underline;
       }
+
+      .content {
+
+      }
     }
 }
 
@@ -417,7 +422,7 @@ hr {
   padding: 5px 5px 5px 10px;
   float: left;
   width: 55%;
-  height: 340px;
+  height: 390px;
   border-right: 2px solid #cecece;
   border-radius: 0px;
 }
@@ -426,7 +431,7 @@ hr {
   padding: 5px 5px 5px 5px;
   float: right;
   width: 42%;
-  height: 340px;
+  height: 390px;
 
 }
 
@@ -438,14 +443,30 @@ hr {
   color: @red-secondary;
 }
 
-.postingNew {
-  color: black;
+.scrollingPadding {
+  padding: 20px 5px 20px 5px;
+}
 
-  .input {
-    display: inline-block !important;
-    font-size: 80%;
-    margin-left: 4px !important;
+.scrollingComments {
+  width: 368px;
+  height: 250px;
+  overflow: scroll;
+  border: 1px solid;
+  border-color: @grey-secondary;
+  padding: 5px 5px 5px 5px;
+}
+
+.newCommentPadding {
+  padding-top: 20px;
+}
+
+.comment {
+  p {
+    padding: 0;
+    margin: 0;
   }
+  padding: 0;
+  margin: 0;
 }
 
 /*----------------------------------------------------------------------------*/

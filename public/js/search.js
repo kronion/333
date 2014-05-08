@@ -19,11 +19,36 @@ $(function() {
     }
   );
 
+  function checkUrl(url){
+
+  }
   $( "#searchbutton" ).click(
     function() {
-      var searchval = $( '#autocomplete').val();
-      document.location.href = 'https://localhost:8443/pages/' + searchval;
-  })
+      $.ajax({
+        type: 'HEAD',
+        url: 'https://localhost:8443/pages/' + $( '#autocomplete').val(),
+        error: function() {
+          console.log('error');
+          alert('Error');
+        },
+        success: function() {
+          document.location.href = 'https://localhost:8443/pages/' + $( '#autocomplete').val();
+        }
+      });
+    }
+  );
 
+  $( "#searchform").submit(function(event) {
+    event.preventDefault();
+    $.ajax({
+      type: 'HEAD',
+      url: 'https://localhost:8443/pages/' + $( '#autocomplete').val(),
+      success: function() {
+        document.location.href = 'https://localhost:8443/pages/' + $( '#autocomplete').val();
+      },
+      error: function() {
+        alert('Error');
+      }
+    });
+  });
 });
-

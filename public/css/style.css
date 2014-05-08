@@ -324,7 +324,7 @@ input {
 /*----------------------------------------------------------------------------*/
 .linkcontainer {
   width: 980px;
-  height: 350px;
+  height: 400px;
   background-color: white;
   box-shadow: 0px 1px 4px #888;
   font-family: 'Roboto Condensed', 'Helvetica', 'Arial', 'sans-serif';
@@ -344,7 +344,7 @@ input {
   padding: 5px 5px 5px 10px;
   float: left;
   width: 55%;
-  height: 340px;
+  height: 390px;
   border-right: 2px solid #cecece;
   border-radius: 0px;
 }
@@ -352,7 +352,7 @@ input {
   padding: 5px 5px 5px 5px;
   float: right;
   width: 42%;
-  height: 340px;
+  height: 390px;
 }
 /*----------------------------------------------------------------------------*/
 /* Formatting Comments                                                        */
@@ -360,13 +360,27 @@ input {
 .commentAuthor {
   color: #cc0704;
 }
-.postingNew {
-  color: black;
+.scrollingPadding {
+  padding: 20px 5px 20px 5px;
 }
-.postingNew .input {
-  display: inline-block !important;
-  font-size: 80%;
-  margin-left: 4px !important;
+.scrollingComments {
+  width: 368px;
+  height: 250px;
+  overflow: scroll;
+  border: 1px solid;
+  border-color: #cccccc;
+  padding: 5px 5px 5px 5px;
+}
+.newCommentPadding {
+  padding-top: 20px;
+}
+.comment {
+  padding: 0;
+  margin: 0;
+}
+.comment p {
+  padding: 0;
+  margin: 0;
 }
 /*----------------------------------------------------------------------------*/
 /* Glyphs                                                                     */

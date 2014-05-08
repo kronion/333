@@ -7,8 +7,10 @@ var Comment = React.createClass({
     var rawMarkup = converter.makeHtml(this.props.children.toString());
     return (
       <div className="comment">
-        <div className="commentAuthor">{this.props.author}</div>
-        <span dangerouslySetInnerHTML={{__html: rawMarkup}} />
+        <span className="commentAuthor">
+          {this.props.author + " "}
+        </span>
+        <span className="actualComment" dangerouslySetInnerHTML={{__html: this.props.children.toString()}} />
       </div>
     );
   }
@@ -57,8 +59,14 @@ var CommentBox = React.createClass({
     return (
       <div className="commentBox">
         <h3>Comments</h3>
-        <CommentList data={this.state.data} />
-        <CommentForm onCommentSubmit={this.handleCommentSubmit} />
+        <div className="scrollingPadding">
+          <div className="scrollingComments">
+            <CommentList data={this.state.data} />
+          </div>
+          <div className="newCommentPadding">
+            <CommentForm onCommentSubmit={this.handleCommentSubmit} />
+          </div>
+        </div>
       </div>
     );
   }
@@ -74,8 +82,8 @@ var CommentForm = React.createClass({
 
   render: function() {
     return (
-      <form className="postingNew pure-form" onSubmit={this.handleSubmit}>
-        <input type="text" placeholder="Say something..." ref="text" />
+      <form className="pure-form" onSubmit={this.handleSubmit}>
+        <input size="30" type="text" placeholder="Say something..." ref="text" />
         <input className="pure-button button-primary" type="submit" value="Post" />
       </form>
     );

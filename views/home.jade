@@ -2,6 +2,7 @@ doctype html
 html(lang="en")
   head
     include base_head
+    include
   body
     include banner
 
@@ -31,6 +32,12 @@ html(lang="en")
               a(href=item.url style="")
                 img(src=item.image, height='200', width='400')
               p=item.descrip
+              div(id="shown_first" style="display:inline")
+                a(href="#" class="archive" id="archive"+item.id style="cursor:pointer" onclick="toggle_text('shown_first', 'hidden_first')").
+                  Save content!
+              div(id="hidden_first" style="display:none").
+                  Saved!
+
           div.rightsidehome
             div(id=item.id)
               script(id='myScript', type='text/jsx', src='../js/comments.js')
