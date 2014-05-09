@@ -22,10 +22,19 @@ html(lang="en")
         div.right_panel
           a(href='/followees/#{user.user_id}') Followees
           a(href='/followers/#{user.user_id}') Followers
-      each link in links
-        p= link
-      each source in image_sources
-        img(src = source, height='42', width='42')
+      each item in json
+        div.linkcontainer
+          div.leftsidehome
+            center
+              h2 PUT TITLE HERE
+              a(href=item.url)
+                img(src=item.image, height='200', width='400')
+              p=item.descrip
+
+          div.rightsidehome
+            div(id=item.id)
+              script(id='myScript', type='text/jsx', src='../js/comments.js')
+        div.spaceinbetween
       if editable
         p editable
     include page_scripts

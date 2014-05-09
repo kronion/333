@@ -8,6 +8,11 @@ function wrongPasswords() {
   $('#signup input[name=password2]').focus();
 }
 
+function existingEmail() {
+  $('#bademail').show().fadeOut(3000);
+  $('#signup input[name=email]').focus();
+}
+
 $('#signup').submit(function(e) {
   e.preventDefault();
   var inputs = $('#signup input');
@@ -32,10 +37,10 @@ $('#signup').submit(function(e) {
         wrongPasswords();
       }
       else if (response.value === 3) {
-        $.post('/login', { email: values['email'],
-                           password: values['password'] }, function() {
-          window.location.href = '/';
-        });
+        window.location.href = '/';
+      }
+      else if (response.value == 4) {
+        existingEmail();
       }
       // Else flash?
     });

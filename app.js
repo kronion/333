@@ -38,6 +38,11 @@ var strings = require('./strings.js');
 var express = require('express');
 var app = express();
 
+/* Express-Mailer */
+var mailer = require('express-mailer');
+var email = require('./email.js');
+mailer.extend(app, email);
+
 /* S3 and multipart form data */
 var busboy = require('connect-busboy');
 var Uploader = require('s3-upload-stream').Uploader;
@@ -80,8 +85,8 @@ var flash = require('connect-flash');
 app.use(flash());
 
 /* Static file serving */
-app.use(express.compress())
-   .use(express.static(__dirname + '/public'));
+app.use(express.compress());
+app.use(express.static(__dirname + '/public'));
 
 /* Passport */
 var passport = require('./routes/authenticate.js')(app, client, cql);
@@ -93,7 +98,7 @@ var request = require('request');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.locals({
-  title: 'GetChive',
+  title: '\'Chive',
   flash: {}
 });
 
@@ -102,6 +107,7 @@ var home = require('./routes/home.js')(client, cql);
 var followers = require('./routes/followers.js')(client, cql);
 var pages = require('./routes/pages.js')(client, cql);
 var bookmarklet = require('./routes/bookmarklet.js')(client, cql);
+var footer = require('./routes/footer.js')();
 
 app.get('/', home);
 
@@ -111,10 +117,59 @@ app.post('/removeFollower', followers.removeFollower);
 
 /* For bookmarklet purposes: adding a link via GET request */
 app.get('/bookmark/:uri_enc', bookmarklet);
-     
+// app.post('/removeLink', followers.removeLink);
+
 app.post('/addLink', followers.addLink);
 
 app.get('/pages/:user_id', pages);
+
+/* Footer routes */
+app.get('/about', footer.about);
+app.get('/contact', footer.contact);
+app.get('/help', footer.help);
+
+app.get('/verify/:email/:ver_code', function (req, res) {
+  var query = 'SELECT * FROM users where email=?';
+  var params = [req.params.email];
+  client.executeAsPrepared(query, params, cql.types.consistencies.one, function (err, result) {
+    if (err) {
+      console.error(err);
+    }
+    else {
+      var rows = result.rows;
+      var text;
+      if (rows[0]) {
+        if (rows[0].verified === true) {
+          text = 'Your account is already verified!';
+          res.render('verified.jade', {text: text});
+        }
+        else {
+          if (rows[0].ver_code !== req.params.ver_code) {
+            text = 'Your verification code does not match!';
+            res.render('verified.jade', {text: text});
+          }
+          else {
+            query = 'UPDATE users SET verified=? WHERE user_id=?';
+            params = [true, rows[0].user_id];
+            client.executeAsPrepared(query, params, cql.types.consistencies.one, function (err) {
+              if (err) {
+                console.error(err);
+              }
+              else {
+                text = 'Congratulations, your account is now verified!';
+                res.render('verified.jade', {text: text});
+              }
+            });
+          }
+        }
+      }
+      else {
+        text = 'You should not have reached this page!';
+        res.render('verified.jade', {text: text});
+      }
+    }
+  });
+});
 
 // Redirect the user to Facebook for authentication.  When complete,
 // Facebook will redirect the user back to the application at
@@ -144,6 +199,7 @@ app.post('/login',
   passport.authenticate('local', { successRedirect: '/',
                                    failureRedirect: '/login',
                                    failureFlash: true }));
+
 app.get('/logout', function(req, res) {
   req.logout();
   res.redirect('/');
@@ -155,9 +211,10 @@ app.get('/signup', function(req, res) {
 
 app.post('/signup', function(req, res) {
   var user_id = cql.types.uuid();
-  var query = 'INSERT INTO users (user_id, email, first_name, image, last_name, password) values (?,?,?,?,?,?)';
-  var params = [user_id, req.body.email, req.body.first_name, strings.anonymous,
-                req.body.last_name, req.body.password];
+  var ver_code = cql.types.timeuuid();
+  var query;
+  var params;
+  
   var response = {};
   if (req.body.email !== req.body.email2) {
     response.value=1;
@@ -167,13 +224,42 @@ app.post('/signup', function(req, res) {
     response.value=2;
     res.send(response);
   }
-  client.executeAsPrepared(query, params, cql.types.consistencies.one, function (err) {
+
+  query = 'SELECT * FROM users WHERE email=?';
+  params = [req.body.email];
+  client.executeAsPrepared(query, params, cql.types.consistencies.one, function (err, result) {
     if (err) {
-      console.log(err);
+      console.error(err);
     }
     else {
-      response.value=3;
-      res.send(response);
+      var rows = result.rows;
+      if (rows[0]) {
+        response.value=4;
+        res.send(response);
+      }
+      else {
+        query = 'INSERT INTO users (user_id, email, first_name, image, last_name, password, ver_code, verified) values (?,?,?,?,?,?,?,?)';
+        params = [user_id, req.body.email, req.body.first_name, strings.anonymous,
+                  req.body.last_name, req.body.password, ver_code, false];
+        client.executeAsPrepared(query, params, cql.types.consistencies.one, function (err) {
+          if (err) {
+            console.log(err);
+          }
+          else {
+            app.mailer.send('email', {
+              to: req.body.email,
+              subject:  'Welcome to \'Chive',
+              ver_code: ver_code
+            }, function (err) {
+              if (err) {
+                console.error(err);
+              }
+            });
+            response.value=3;
+            res.send(response);
+          }
+        });
+      }
     }
   });
 });
@@ -250,6 +336,145 @@ app.post('/upload/image/:user_id', function (req, res) {
     req.pipe(req.busboy);
   }
 });
+
+/* This section is for commenting capabilities */
+app.get('/comments/:id', function(req, res) {
+  var comments = [];
+  var query = 'SELECT * FROM comments WHERE user_link_id=?';
+  var params = [req.params.id];
+  client.executeAsPrepared(query, params, cql.types.consistencies.one, function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      var rows = result.rows;
+      if (rows[0]) {
+        for (var i = 0; i < rows.length; i++) {
+          var dict = {};
+          dict.author = rows[i].author;
+          dict.text = rows[i].body;
+          comments[i] = dict;
+        }
+      }
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(comments));
+    }
+  });
+});
+
+app.post('/comments/:id', function(req, res) {
+  var comment_id = cql.types.timeuuid();
+  var query = 'INSERT INTO comments (user_link_id, comment_id, user_id, author, body) values (?,?,?,?,?)';
+  var params = [req.params.id, comment_id, req.user.user_id, req.user.email, req.body.text];
+  client.executeAsPrepared(query, params, cql.types.consistencies.one, function(err) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      var comments = [];
+      var query = 'SELECT * FROM comments WHERE user_link_id=?';
+      var params = [req.params.id];
+      client.executeAsPrepared(query, params, cql.types.consistencies.one, function(err, result) {
+        if (err) {
+          console.log(err);
+        }
+        else {
+          var rows = result.rows;
+          if (rows[0]) {
+            for (var i = 0; i < rows.length; i++) {
+              var dict = {};
+              dict.author = rows[i].author;
+              dict.text = rows[i].body;
+              comments[i] = dict;
+            }
+          }
+          res.setHeader('Content-Type', 'application/json');
+          res.send(JSON.stringify(comments));
+        }
+      });
+    }
+  });
+});
+
+/* This section is for commenting capabilities */
+app.get('/comments/:id', function(req, res) {
+  var comments = [];
+  var query = 'SELECT * FROM comments WHERE user_link_id=?';
+  var params = [req.params.id];
+  client.executeAsPrepared(query, params, cql.types.consistencies.one, function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      var rows = result.rows;
+      if (rows) {
+        for (var i = 0; i < rows.length; i++) {
+          var dict = {};
+          dict.author = rows[i].author;
+          dict.text = rows[i].body;
+          comments[i] = dict;
+        }
+      }
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(comments));
+    }
+  });
+});
+
+app.post('/comments/:id', function(req, res) {
+  var comment_id = cql.types.timeuuid();
+  var query = 'INSERT INTO comments (user_link_id, comment_id, user_id, author, body) values (?,?,?,?,?)';
+  var params = [req.params.id, comment_id, req.user.user_id, req.user.email, req.body.text];
+  client.executeAsPrepared(query, params, cql.types.consistencies.one, function(err) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      var comments = [];
+      var query = 'SELECT * FROM comments WHERE user_link_id=?';
+      var params = [req.params.id];
+      client.executeAsPrepared(query, params, cql.types.consistencies.one, function(err, result) {
+        if (err) {
+          console.log(err);
+        }
+        else {
+          var rows = result.rows;
+          if (rows) {
+            for (var i = 0; i < rows.length; i++) {
+              var dict = {};
+              dict.author = rows[i].author;
+              dict.text = rows[i].body;
+              comments[i] = dict;
+            }
+          }
+          res.setHeader('Content-Type', 'application/json');
+          res.send(JSON.stringify(comments));
+        }
+      });
+    }
+  });
+});
+
+app.get('/autocomp', function(req,res) {
+  var search =[];
+  var query = 'SELECT email FROM users';
+  client.executeAsPrepared(query, cql.types.consistencies.one, function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      var rows = result.rows;
+      if (rows) {
+        for (var i = 0; i < rows.length; i++) {
+          search[i] = rows[i].email;
+        }
+      }
+      res.send(JSON.stringify(search));
+    }
+  });
+});
+
+app.get('')
 
 /* Create HTTP and HTTPS servers with Express object */
 var httpServer = http.createServer(app);

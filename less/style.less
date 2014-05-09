@@ -15,7 +15,7 @@
  *                  conventions:
  *
  *                  * Do not use the !important flag unless there is absolutely
- *                    zero alternative. 
+ *                    zero alternative.
  *
  *                  * Prefer classes to IDs, and please consider how you can
  *                    reuse the styles you create.
@@ -205,7 +205,7 @@ hr {
 
   form {
     display: inline;
-    
+
     line-height: @nav-height;
     vertical-align: middle;
 
@@ -239,7 +239,7 @@ hr {
     margin-right: 10px;
     margin-left: 10px;
   }
-  
+
   #divide {
     border-right: 2px solid #cecece;
     -webkit-border-image: -webkit-linear-gradient(transparent, #dedede, transparent);
@@ -320,11 +320,13 @@ hr {
 .feed {
   display: block;
 
-  width: 100%;
-  height: 100%;
-  
+  width: 980px;
+  height: 45px;
+
   background-color: #fff;
   .box-shadow-primary;
+
+  padding-top:10px;
 }
 /*----------------------------------------------------------------------------*/
 /* Profile page                                                               */
@@ -444,6 +446,37 @@ hr {
 /*----------------------------------------------------------------------------*/
 /* Signup form                                                                */
 /*----------------------------------------------------------------------------*/
+.tag() {
+  display: none;
+  position: absolute;
+
+  left: 90%;
+
+  padding: 8px;
+
+  color: #fff;
+  background-color: @red-secondary;
+  .box-shadow-secondary;
+
+  white-space: nowrap;
+
+  &:before {
+    content: ' ';
+
+    position: absolute;
+
+    top: 2px;
+    left: -24px;
+    
+    border: 15px solid transparent;
+    border-right-color: @red-secondary;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
 #signup {
   label {
     display: inline-block;
@@ -460,6 +493,21 @@ hr {
     width: 50%;
     margin-left: 25%;
     margin-top: 10px;
+  }
+
+  #emailmatch {
+    .tag;
+    top: 225px;
+  }
+
+  #passmatch {
+    .tag;
+    top: 333px;
+  }
+
+  #bademail {
+    .tag;
+    top: 171px;
   }
 }
 
@@ -502,6 +550,11 @@ hr {
 #passmatch {
   .tag;
   top: 333px;
+}
+
+#bademail {
+  .tag;
+  top: 171px;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -565,6 +618,8 @@ hr {
   position: fixed;
   width: 100%;
   height: 100%;
+
+  cursor: pointer;
 }
 
 .popup {
@@ -581,16 +636,15 @@ hr {
   height:300;
   margin-left: -150px;
   margin-top: -150px;
-  border-radius: 0px;
 }
 
 /*----------------------------------------------------------------------------*/
-/* Middle Info on frontnew.jade                                               */
+/* Front page                                                                 */
 /*----------------------------------------------------------------------------*/
 
 .info {
   background-color: white;
-  height: 440px;
+  height: 460px;
   width: 960px;
 
   position: fixed;
@@ -600,7 +654,6 @@ hr {
   margin-left: -480px;
 
   .box-shadow-primary;
-  border-radius: 0px;
   color: black;
 }
 
@@ -626,6 +679,24 @@ hr {
   margin-top: 15px;
   margin-left: 15px;
   font-size: 100 px;
+
+  #emailmatch {
+    .tag;
+    left: 93%;
+    top: 240px;
+  }
+
+  #passmatch {
+    .tag;
+    left: 93%;
+    top: 346px;
+  }
+
+  #bademail {
+    .tag;
+    left: 93%;
+    top: 186px;
+  }
 }
 
 /*----------------------------------------------------------------------------*/
@@ -707,6 +778,7 @@ hr {
   color: @red-secondary;
 }
 
+
 /*----------------------------------------------------------------------------*/
 /* Flash messages                                                             */
 /*----------------------------------------------------------------------------*/
@@ -731,6 +803,87 @@ hr {
   .pure-visible-mini {
     display: none !important;
   }
+}
+
+/*----------------------------------------------------------------------------*/
+/* Homepage                                                                   */
+/*----------------------------------------------------------------------------*/
+
+.linkcontainer{
+  width: 980px;
+  height: 400px;
+  background-color: white;
+  .box-shadow-primary;
+
+  font-family: 'Roboto Condensed', 'Helvetica', 'Arial', 'sans-serif';
+
+  a {
+      text-decoration: none;
+      color: @red-secondary;
+      &:hover {
+        color: @red-primary;
+        text-decoration: underline;
+      }
+
+      .content {
+
+      }
+    }
+}
+
+.spaceinbetween {
+  height: 20px;
+}
+
+.leftsidehome {
+  padding: 5px 5px 5px 10px;
+  float: left;
+  width: 55%;
+  height: 390px;
+  border-right: 2px solid #cecece;
+  border-radius: 0px;
+}
+
+.rightsidehome {
+  padding: 5px 5px 5px 5px;
+  float: right;
+  width: 42%;
+  height: 390px;
+
+}
+
+/*----------------------------------------------------------------------------*/
+/* Formatting Comments                                                        */
+/*----------------------------------------------------------------------------*/
+
+.commentAuthor {
+  color: @red-secondary;
+}
+
+.scrollingPadding {
+  padding: 20px 5px 20px 5px;
+}
+
+.scrollingComments {
+  width: 368px;
+  height: 250px;
+  overflow: scroll;
+  border: 1px solid;
+  border-color: @grey-secondary;
+  padding: 5px 5px 5px 5px;
+}
+
+.newCommentPadding {
+  padding-top: 20px;
+}
+
+.comment {
+  p {
+    padding: 0;
+    margin: 0;
+  }
+  padding: 0;
+  margin: 0;
 }
 
 /*----------------------------------------------------------------------------*/
