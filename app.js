@@ -139,11 +139,7 @@ app.get('/verify/:email/:ver_code', function (req, res) {
           res.render('verified.jade', {text: text});
         }
         else {
-          if (rows[0].ver_code !== req.params.ver_code) {
-            text = 'Your verification code does not match!';
-            res.render('verified.jade', {text: text});
-          }
-          else {
+          if (rows[0].ver_code === req.params.ver_code) {
             query = 'UPDATE users SET verified=? WHERE user_id=?';
             params = [true, rows[0].user_id];
             client.executeAsPrepared(query, params, cql.types.consistencies.one, function (err) {
@@ -155,6 +151,10 @@ app.get('/verify/:email/:ver_code', function (req, res) {
                 res.render('verified.jade', {text: text});
               }
             });
+          }
+          else {
+            text = 'Your verification code does not match!';
+            res.render('verified.jade', {text: text});
           }
         }
       }
