@@ -11,4 +11,7 @@ $(document).ready(function() {
             $(".popup, .overlay").hide(); 
         }); 
     }); 
+    $(".overlay").click(function(e) {
+      $(".popup, .overlay").hide();
+    });
 });
