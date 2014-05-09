@@ -2,27 +2,37 @@ doctype html
 html(lang="en")
   head
     include base_head
-    script(src='../js/archiveTimeline.js')
+    script(src=js/archiveTimeline.js')
   body
     include banner
     div.content
       div.feed
-        form.pure-form(action='/addFollower' method='post')
-          input(type='text' name='addFollower' placeholder='AddFollower Here' autofocus=true required=true)
-          input(type='submit' value='Submit')
-        form(action='/removeFollower' method='post')
-          input(type='text' name='removeFollower' placeholder='RemoveFollower Here' autofocus=true required=true)
-          input(type='submit' value='Submit')
-        form(action='/addLink' method='post')
-          input(type='url' name='addLink' placeholder='AddLink Here' autofocus=true required=true)
-          input(type='submit' value='Submit')
-        each item in json 
-          div(class=item.url)
-            p=item.url     
-            img(src=item.image, height='400', width='400')
-            p=item.descrip
-            a(href='#', class='archive', id='archive'+item.id) Save This Article!
+        center
+          form.pure-form(action='/addLink' method='post')
+            input(type='url' name='addLink' placeholder='Share this!' autofocus=true required=true style="width:400px")
+            // input.pure-button.button-primary(type='submit' value='Submit')
+      div.spaceinbetween
+
+      each item in json
+        - var user = item.first_name + ' ' + item.last_name
+        div.linkcontainer
+          div.leftsidehome
+            center
+              h3
+                a(href='https://localhost:8443/pages/'+item.id) #{user}
+              h2 PUT TITLE HERE
+              a(href=item.url style="")
+                img(src=item.image, height='200', width='400')
+              p=item.descrip
+              div(id="shown_first" style="display:inline")
+                a(href="#" class="archive" id="archive"+item.id style="cursor:pointer" onclick="toggle_text('shown_first', 'hidden_first')").
+                  Save content!
+              div(id="hidden_first" style="display:none").
+                  Saved!
+
+          div.rightsidehome
             div(id=item.id)
-              script(id='myScript', type='text/jsx', src='../js/comments.js')
+              script(id='myScript', type='text/jsx', src='js/comments.js')
+        div.spaceinbetween
+
     include scripts
-    
