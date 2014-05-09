@@ -22,10 +22,10 @@ html(lang="en")
         div.right_panel
           a(href='/followees/#{user.user_id}') Followees
           a(href='/followers/#{user.user_id}') Followers
-      each link in links
-        p= link
-      each source in image_sources
-        img(src = source, height='42', width='42')
+      each item in json
+        p= item.url
+        img(src = item.image, height='400', width='400')
+        p= item.descrip
       if editable
         p editable
     include page_scripts
