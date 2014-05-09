@@ -16,6 +16,7 @@ module.exports = function(client, cql) {
         if (rows[0]) {
           for (var i = 0; i < rows.length; i++) {
             var dict = {};
+            dict.id = rows[i].user_link_id;
             dict.url = rows[i].url;
             dict.image = rows[i].img_url;
             dict.descrip = rows[i].descrip;
@@ -31,7 +32,7 @@ module.exports = function(client, cql) {
             console.log(err);
           }
           else {
-            var row = result.rows[0];
+            row = result.rows[0];
             if (!row) {
               // Should redirect to a search page
               res.redirect('/');
@@ -48,11 +49,31 @@ module.exports = function(client, cql) {
                   editable = true;
                 }
               }
-              res.render('profile.jade', { user: req.user, 
-                                           editable: editable,
-                                           name: name,
-                                           image: image,
-                                           json: json
+              query = 'SELECT * FROM followers WHERE user_id=?';
+              params = [req.user.user_id];
+              client.executeAsPrepared(query, params, cql.types.consistencies.one,
+                                       function (err, results) {
+                if (err) {
+                  console.log(err);
+                }
+                else {
+                  rows = results.rows;
+                  var followed = false;
+                  for (var i = 0; i < rows.length; i++) {
+                    if (user_id === rows[i].follower_id) {
+                      followed = true;
+                      break;
+                    }
+                  }
+                  res.render('profile.jade', { user: req.user, 
+                                               editable: editable,
+                                               user_id: user_id,
+                                               name: name,
+                                               image: image,
+                                               followed: followed,
+                                               json: json
+                  });
+                }
               });
             }
           }

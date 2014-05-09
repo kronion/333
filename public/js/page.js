@@ -13,3 +13,17 @@ function change_async () {
     }
   });
 }
+
+$('#follow').click(function(e) {
+  e.preventDefault();
+  var self = this;
+  $.post($(self).attr('href'), function (data) {
+    console.log(data);
+    if (data.response === 1) {
+      console.log('here');
+      $(self).attr('disabled', true);
+      $(self).addClass('button-disabled');
+      $(self).removeClass('button-primary');
+    }
+  });
+});

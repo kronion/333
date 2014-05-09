@@ -108,9 +108,9 @@ var footer = require('./routes/footer.js')();
 
 app.get('/', home);
 
-app.post('/addFollower', followers.addFollower);
+app.post('/addFollower/:user_id', followers.addFollower);
 
-app.post('/removeFollower', followers.removeFollower);
+app.post('/removeFollower/:user_id', followers.removeFollower);
 
 // app.post('/removeLink', followers.removeLink);
 
@@ -400,7 +400,7 @@ app.get('/autocomp', function(req,res) {
     }
     else {
       var rows = result.rows;
-      if (rows) {
+      if (rows[0]) {
         for (var i = 0; i < rows.length; i++) {
           search[i] = rows[i].email;
         }
