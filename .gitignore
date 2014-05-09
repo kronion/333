@@ -7,7 +7,7 @@ server.csr
 server.crt
 pem_key
 
-#AWS Credentials
+# AWS Credentials
 uploadCreds.js
 deleteCreds.js
 creds.zip
