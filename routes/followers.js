@@ -67,19 +67,32 @@ module.exports = function (client, cql) {
     });
   };
   var addLink = function (req, res) {
-    var url = req.body.addLink;
-    var query = 'SELECT link_id FROM url_to_links WHERE url=?';
-    var params = [url];
+    /* Console logging for testing purposes.  Will delete later. */
+    console.log(JSON.stringify(req.body));
+    var rows;
+    var url;
+    var query;
+    var params;
+
+    /* Obtain the url from the form or from one's timeline. */
+    if (req.body.addLink) {
+      url = req.body.addLink;
+    }
+    else if (req.body.url) {
+      url = req.body.url;
+    }
+    query = 'SELECT link_id FROM url_to_links WHERE url=?';
+    params = [url];
     client.executeAsPrepared(query, params, cql.types.consistencies.one, 
                              function(err, result) {
       if (err) {
         console.log(err);
       }
       else {
-        var rows = result.rows;
+        rows = result.rows;
         if (rows[0]) {
           var link_id = rows[0].link_id;
-          query = 'SELECT img_url, descrip FROM global_links WHERE link_id=?';
+          query = 'SELECT * FROM global_links WHERE link_id=?';
           params = [link_id];
           client.executeAsPrepared(query, params, cql.types.consistencies.one, 
                                    function(err, result) {
@@ -90,9 +103,10 @@ module.exports = function (client, cql) {
               rows = result.rows;
               var img_url = rows[0].img_url;
               var descrip = rows[0].descrip;
+              var title = rows[0].title;
               var user_link_id = cql.types.timeuuid();
-              query = 'INSERT INTO user_links (user_id, user_link_id, url, img_url, descrip) VALUES (?,?,?,?,?)';
-              params = [req.user.user_id, user_link_id, url, img_url, descrip];
+              query = 'INSERT INTO user_links (user_id, user_link_id, url, img_url, descrip, title) VALUES (?,?,?,?,?,?)';
+              params = [req.user.user_id, user_link_id, url, img_url, descrip, title];
 
               client.executeAsPrepared(query, params, cql.types.consistencies.one, 
                                        function(err) {
@@ -105,7 +119,7 @@ module.exports = function (client, cql) {
                   client.execute(query, params, cql.types.consistencies.one, 
                                  function(err) {
                     if (err) {
-                      console.log(error);
+                      console.log(err);
                     }
                     else {
                       query = 'SELECT * FROM followees WHERE user_id = ?';
@@ -116,16 +130,16 @@ module.exports = function (client, cql) {
                           console.log(err);
                         }
                         else {
-                          var rows = result.rows;
-                          if (rows) {
+                          rows = result.rows;
+                          if (rows[0]) {
                             for (var i = 0; i < rows.length; i++) {
-                              query = 'INSERT INTO timeline (user_id, user_link_id, owner_id, url, img_url, descrip) VALUES (?, ?, ?, ?, ?, ?)';
-                              params = [rows[i].followee_id, user_link_id, req.user.user_id, url, img_url, descrip];
+                              query = 'INSERT INTO timeline (user_id, user_link_id, owner_id, url, img_url, descrip, title) VALUES (?,?,?,?,?,?,?)';
+                              params = [rows[i].followee_id, user_link_id, req.user.user_id, url, img_url, descrip, title];
                               client.execute(query, params, 
                                              cql.types.consistencies.one, 
                                              function(err) {
                                 if (err) {
-                                  console.log(err);
+                                  console.error(err);
                                 }
                                 else {
                                   console.log('Successfully inserted into followees timeline');
@@ -144,19 +158,71 @@ module.exports = function (client, cql) {
         }
         else {
           scraper(url, function(json) {
+
+            /* Create timeuuids for the global link and user link table. */
             var link_id = cql.types.timeuuid();
             var user_link_id = cql.types.timeuuid();
-            var img_url = json.og.image;
-            var descrip = json.og.description;
+
+            /* Set the default image and description and title. */
+            var img_url = 'http://www.aof-clan.com/AoFWiki/images/6/60/No_Image_Available.png';
+            var descrip = 'No description available';
+            var title = 'No title';
+
+            /* Check the results of the scraper for the image and description
+               and whatever other values that one needs. */
+            if (json.title) {
+              title = json.title;
+            }
+            else if (json.og) {
+              if (json.og.title) {
+                title = json.og.title;
+              }
+            }
+            else if (json.twitter) {
+              if (json.twitter.title) {
+                title = json.twitter.title;
+              }
+            }
+
+            if (json.description) {
+              descrip = json.description+'...';
+            }
+            else if (json.og) {
+              if (json.og.description) {
+                descrip = json.og.description+'...';
+              }
+            }
+            else if (json.twitter) {
+              if (json.twitter.description) {
+                descrip = json.twitter.description+'...';
+              }
+            }
+
+            if (json.image) {
+              /* Scraping Google.com for an image only provides the ending
+                 to the HTTP address, and therefore this image address must
+                 be appended to the url. */
+              img_url = url+json.image;
+            }
+            else if (json.og) {
+              if (json.og.image) {
+                img_url = json.og.image;
+              }
+            }
+            else if (json.twitter) {
+              if (json.twitter.image) {
+                img_url = json.twitter.image;
+              }
+            }
 
             var queries = [
               {
-                query: 'INSERT INTO global_links (link_id, url, img_url, descrip) VALUES (?,?,?,?)',
-                params: [link_id, url, img_url, descrip]
+                query: 'INSERT INTO global_links (link_id, url, img_url, descrip, title) VALUES (?,?,?,?,?)',
+                params: [link_id, url, img_url, descrip, title]
               },
               {
-                query: 'INSERT INTO user_links (user_id, user_link_id, url, img_url, descrip) VALUES (?,?,?,?,?)',
-                params: [req.user.user_id, user_link_id, url, img_url, descrip]
+                query: 'INSERT INTO user_links (user_id, user_link_id, url, img_url, descrip, title) VALUES (?,?,?,?,?,?)',
+                params: [req.user.user_id, user_link_id, url, img_url, descrip, title]
               },
               {
                 query: 'INSERT INTO url_to_links (url, link_id) VALUES (?,?)',
@@ -170,31 +236,30 @@ module.exports = function (client, cql) {
             client.executeBatch(queries, cql.types.consistencies.one, 
                                 function (err) {
               if (err) {
-                console.log(err);
+                console.error(err);
               }
               else {
-                var rows = result;
-                console.log('parsed and updated everything (now with user_link_ids)');
+                console.log('NEW link successfully inserted');
                 query = 'SELECT * FROM followees WHERE user_id = ?';
                 params = [req.user.user_id];
                 client.executeAsPrepared(query, params, cql.types.consistencies.one, 
                                          function (err, result) {
                   if (err) {
-                    console.log(err);
+                    console.error(err);
                   }
                   else {
-                    var rows = result.rows;
-                    if (rows) {
+                    rows = result.rows;
+                    if (rows[0]) {
                       for (var i = 0; i < rows.length; i++) {
-                        query = 'INSERT INTO timeline (user_id, user_link_id, owner_id, url, img_url, descrip) VALUES (?, ?, ?, ?, ?, ?)';
-                        params = [rows[i].followee_id, user_link_id, req.user.user_id, url, img_url, descrip];
+                        query = 'INSERT INTO timeline (user_id, user_link_id, owner_id, url, img_url, descrip, title) VALUES (?, ?, ?, ?, ?, ?,?)';
+                        params = [rows[i].followee_id, user_link_id, req.user.user_id, url, img_url, descrip, title];
                         client.executeAsPrepared(query, params, cql.types.consistencies.one, 
                                                  function(err) {
                           if (err) {
-                            console.log(err);
+                            console.error(err);
                           }
                           else {
-                            console.log('Successfully inserted into followees timeline');
+                            console.log('Followees timeline updated with NEW link');
                           }
                         });
                       }
