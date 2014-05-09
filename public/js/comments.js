@@ -7,10 +7,22 @@ var Comment = React.createClass({
     var rawMarkup = converter.makeHtml(this.props.children.toString());
     return (
       <div className="comment">
-        <h3 className="commentAuthor">{this.props.author}</h3>
-        <span dangerouslySetInnerHTML={{__html: rawMarkup}} />
+        <span className="commentAuthor">
+          {this.props.author + " "}
+        </span>
+        <span className="actualComment" dangerouslySetInnerHTML={{__html: this.props.children.toString()}} />
       </div>
     );
+  }
+});
+
+// FIND WAY TO COMBINE THIS WITH ABOVE FOR AUTHOR + COMMENT TEXT
+var CommentList = React.createClass({
+  render: function() {
+    var commentNodes = this.props.data.map(function (comment, index) {
+      return <Comment key={index} author={comment.author}>{comment.text}</Comment>;
+    });
+    return <div className="commentList">{commentNodes}</div>;
   }
 });
 
@@ -46,24 +58,19 @@ var CommentBox = React.createClass({
   render: function() {
     return (
       <div className="commentBox">
-        <h2>Comments</h2>
-        <CommentList data={this.state.data} />
-        <CommentForm onCommentSubmit={this.handleCommentSubmit} />
+        <h3>Comments</h3>
+        <div className="scrollingPadding">
+          <div className="scrollingComments">
+            <CommentList data={this.state.data} />
+          </div>
+          <div className="newCommentPadding">
+            <CommentForm onCommentSubmit={this.handleCommentSubmit} />
+          </div>
+        </div>
       </div>
     );
   }
 });
-
-var CommentList = React.createClass({
-  render: function() {
-    var commentNodes = this.props.data.map(function (comment, index) {
-      return <Comment key={index} author={comment.author}>{comment.text}</Comment>;
-    });
-    return <div className="commentList">{commentNodes}</div>;
-  }
-});
-
-
 
 var CommentForm = React.createClass({
   handleSubmit: function() {
@@ -72,11 +79,12 @@ var CommentForm = React.createClass({
     this.refs.text.getDOMNode().value = '';
     return false;
   },
+
   render: function() {
     return (
-      <form className="commentForm" onSubmit={this.handleSubmit}>
-        <input type="text" placeholder="Say something..." ref="text" />
-        <input type="submit" value="Post" />
+      <form className="pure-form" onSubmit={this.handleSubmit}>
+        <input size="30" type="text" placeholder="Say something..." ref="text" />
+        <input className="pure-button button-primary" type="submit" value="Post" />
       </form>
     );
   }
