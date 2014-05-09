@@ -5,7 +5,7 @@ module.exports = function (client, cql) {
   var addFollower = function (req, res) {
     var query = 'SELECT user_id FROM users WHERE email=?';
     var params = [req.body.addFollower];
-    client.execute(query, params, cql.types.consistencies.one, 
+    client.execute(query, params, cql.types.consistencies.one,
                    function (err, result) {
       if(err) {
         console.log(err);
@@ -22,7 +22,7 @@ module.exports = function (client, cql) {
             params: [follower_id, req.user.user_id]
           }
         ];
-        client.executeBatch(queries, cql.types.consistencies.one, 
+        client.executeBatch(queries, cql.types.consistencies.one,
                             function (err) {
           if (err) {
             console.log(err);
@@ -37,7 +37,7 @@ module.exports = function (client, cql) {
   var removeFollower = function(req, res) {
     var query1 = 'SELECT user_id FROM users WHERE email=?';
     var params1 = [req.body.removeFollower];
-    client.execute(query1, params1, cql.types.consistencies.one, 
+    client.execute(query1, params1, cql.types.consistencies.one,
                    function(err, result) {
       var follower_id = result.rows[0].user_id;
       if(err) {
@@ -54,7 +54,7 @@ module.exports = function (client, cql) {
             params: [follower_id, req.user.user_id]
           }
         ];
-        client.executeBatch(queries1, cql.types.consistencies.one, 
+        client.executeBatch(queries1, cql.types.consistencies.one,
                             function (err) {
           if (err) {
             console.log(err);
@@ -66,9 +66,47 @@ module.exports = function (client, cql) {
       }
     });
   };
+  /*var removeLink = function(req, res) {
+    var url = req.body.removeLink;
+    var query = 'SELECT link_id FROM url_to_links WHERE url=?';
+    var params = [url];
+    client.executeAsPrepared(query, params, cql.types.consistencies.one,
+                             function(err, result) {
+      if (err) {
+        console.log(err);
+      }
+      else {
+        var rows = result.rows;
+        if (rows[0]) {
+          var link_id = rows[0].link_id;
+          var queries = [
+            {
+              query: 'DELETE FROM user_links WHERE user_id=? AND user_link_id=?',
+              params: [req.user.user_id, link_id]
+            },
+            {
+              query: 'DELETE FROM user_link_id_to_user WHERE user_link_id=?',
+              params: [link_id]
+            },
+            {
+              query: 'DELETE FROM timeline WHERE user_id=? AND user_link_id=?',
+              params: [req.user.user_id, link_id]
+            }
+          ];
+          client.executeBatch(queries, cql.types.consistencies.one, function(err) {
+            if (err) {
+              console.log(err);
+            }
+            else {
+              console.log("removed Link");
+              res.redirect('/');
+            }
+          });
+        }
+      }
+    });
+  };*/
   var addLink = function (req, res) {
-    /* Console logging for testing purposes.  Will delete later. */
-    console.log(JSON.stringify(req.body));
     var rows;
     var url;
     var query;
@@ -94,7 +132,7 @@ module.exports = function (client, cql) {
           var link_id = rows[0].link_id;
           query = 'SELECT * FROM global_links WHERE link_id=?';
           params = [link_id];
-          client.executeAsPrepared(query, params, cql.types.consistencies.one, 
+          client.executeAsPrepared(query, params, cql.types.consistencies.one,
                                    function(err, result) {
             if (err) {
               console.log(err);
@@ -108,7 +146,7 @@ module.exports = function (client, cql) {
               query = 'INSERT INTO user_links (user_id, user_link_id, url, img_url, descrip, title) VALUES (?,?,?,?,?,?)';
               params = [req.user.user_id, user_link_id, url, img_url, descrip, title];
 
-              client.executeAsPrepared(query, params, cql.types.consistencies.one, 
+              client.executeAsPrepared(query, params, cql.types.consistencies.one,
                                        function(err) {
                 if (err) {
                   console.log(err);
@@ -116,7 +154,7 @@ module.exports = function (client, cql) {
                 else {
                   query = 'INSERT INTO user_link_id_to_user (user_link_id, user_id) VALUES (?,?)';
                   params = [user_link_id, req.user.user_id];
-                  client.execute(query, params, cql.types.consistencies.one, 
+                  client.execute(query, params, cql.types.consistencies.one,
                                  function(err) {
                     if (err) {
                       console.log(err);
@@ -124,19 +162,21 @@ module.exports = function (client, cql) {
                     else {
                       query = 'SELECT * FROM followees WHERE user_id = ?';
                       params = [req.user.user_id];
-                      client.execute(query, params, cql.types.consistencies.one, 
+                      client.execute(query, params, cql.types.consistencies.one,
                                      function (err, result) {
                         if (err) {
                           console.log(err);
                         }
                         else {
+<<<<<<< HEAD
                           rows = result.rows;
                           if (rows[0]) {
+                            console.log(req.user.email);
                             for (var i = 0; i < rows.length; i++) {
-                              query = 'INSERT INTO timeline (user_id, user_link_id, owner_id, url, img_url, descrip, title) VALUES (?,?,?,?,?,?,?)';
-                              params = [rows[i].followee_id, user_link_id, req.user.user_id, url, img_url, descrip, title];
-                              client.execute(query, params, 
-                                             cql.types.consistencies.one, 
+                              query = 'INSERT INTO timeline (user_id, user_link_id, owner_id, owner_first_name, owner_last_name, owner_email, url, img_url, descrip) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+                              params = [rows[i].followee_id, user_link_id, req.user.user_id, req.user.first_name, req.user.last_name, req.user.email, url, img_url, descrip];
+                              client.execute(query, params,
+                                             cql.types.consistencies.one,
                                              function(err) {
                                 if (err) {
                                   console.error(err);
@@ -233,7 +273,7 @@ module.exports = function (client, cql) {
                 params: [user_link_id, req.user.user_id]
               }
             ];
-            client.executeBatch(queries, cql.types.consistencies.one, 
+            client.executeBatch(queries, cql.types.consistencies.one,
                                 function (err) {
               if (err) {
                 console.error(err);
@@ -242,7 +282,7 @@ module.exports = function (client, cql) {
                 console.log('NEW link successfully inserted');
                 query = 'SELECT * FROM followees WHERE user_id = ?';
                 params = [req.user.user_id];
-                client.executeAsPrepared(query, params, cql.types.consistencies.one, 
+                client.executeAsPrepared(query, params, cql.types.consistencies.one,
                                          function (err, result) {
                   if (err) {
                     console.error(err);
@@ -251,9 +291,9 @@ module.exports = function (client, cql) {
                     rows = result.rows;
                     if (rows[0]) {
                       for (var i = 0; i < rows.length; i++) {
-                        query = 'INSERT INTO timeline (user_id, user_link_id, owner_id, url, img_url, descrip, title) VALUES (?, ?, ?, ?, ?, ?,?)';
-                        params = [rows[i].followee_id, user_link_id, req.user.user_id, url, img_url, descrip, title];
-                        client.executeAsPrepared(query, params, cql.types.consistencies.one, 
+                        query = 'INSERT INTO timeline (user_id, user_link_id, owner_id, owner_first_name, owner_last_name, owner_email, url, img_url, descrip) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+                              params = [rows[i].followee_id, user_link_id, req.user.user_id, req.user.first_name, req.user.last_name, req.user.email, url, img_url, descrip];
+                        client.executeAsPrepared(query, params, cql.types.consistencies.one,
                                                  function(err) {
                           if (err) {
                             console.error(err);
@@ -276,5 +316,7 @@ module.exports = function (client, cql) {
   };
   return { addLink: addLink,
            addFollower: addFollower,
-           removeFollower: removeFollower };
+           removeFollower: removeFollower,
+           //removeLink: removeLink
+         };
 };
