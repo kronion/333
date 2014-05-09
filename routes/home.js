@@ -10,7 +10,7 @@ module.exports = function(client, cql) {
       var image_sources = [];
       var timedecay = [];
       var json = [];
-      client.executeAsPrepared(query, params, cql.types.consistencies.one, 
+      client.executeAsPrepared(query, params, cql.types.consistencies.one,
                                function(err, result) {
         if (err) {
           console.log(err);
@@ -20,6 +20,9 @@ module.exports = function(client, cql) {
           if (rows[0]) {
             for (var i = 0; i < rows.length; i++) {
               var dict = {};
+              dict.first_name = rows[i].owner_first_name;
+              dict.last_name = rows[i].owner_last_name;
+              dict.email = rows[i].owner_email;
               dict.id = rows[i].user_link_id;
               dict.url = rows[i].url;
               dict.image = rows[i].img_url;
