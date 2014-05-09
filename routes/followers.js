@@ -168,7 +168,6 @@ module.exports = function (client, cql) {
                           console.log(err);
                         }
                         else {
-<<<<<<< HEAD
                           rows = result.rows;
                           if (rows[0]) {
                             console.log(req.user.email);
