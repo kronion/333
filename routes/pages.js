@@ -10,30 +10,29 @@ module.exports = function(client, cql) {
         res.redirect('/');
       }
       else {
-        var rows = result.rows;
-        var links = [];
-
-        for (var i = 0; i < rows.length; i++) {
-          links[i] = rows[i].url;
-        }
-
-        query = 'SELECT img_url FROM user_links WHERE user_id=?';
-        params = [req.params.user_id];
+        var user_id = result.rows[0].user_id;
+        query = 'SELECT * FROM user_links WHERE user_id=?';
+        params = [user_id];
         client.executeAsPrepared(query, params, cql.types.consistencies.one, 
                                  function(err, result) {
           if(err) {
             console.log(err);
           }
           else {
-            rows= result.rows;
-            var image_sources = [];
-
-            for (i = 0; i < rows.length; i++) {
-              image_sources[i] = rows[i].img_url;
+            var rows = result.rows;
+            var json = [];
+            if (rows[0]) {
+              for (var i = 0; i < rows.length; i++) {
+                var dict = {};
+                dict.url = rows[i].url;
+                dict.image = rows[i].img_url;
+                dict.descrip = rows[i].descrip;
+                dict.title = rows[i].title;
+                json[i] = dict;
+              }
             }
-
             query = 'SELECT first_name, last_name, image FROM users WHERE user_id=?';
-            params = [req.params.user_id];
+            params = [user_id];
             client.executeAsPrepared(query, params, cql.types.consistencies.one,
                                      function (err, result) {
               if (err) {
@@ -62,7 +61,7 @@ module.exports = function(client, cql) {
                                                name: name,
                                                image: image,
                                                links: links, 
-                                               image_sources: image_sources
+                                               json: json
                   });
                 }
               }
