@@ -1,7 +1,7 @@
 /* DB and sessions */
 var cql = require('node-cassandra-cql');
 var CasClient = cql.Client;
-var client = new CasClient({ hosts: ['localhost'], keyspace: 'getchive' });
+var client = new CasClient({ hosts: ['localhost'], keyspace: 'chive' });
 
 /* Secret key to be used later */
 var secret = require('../keyfile.js');

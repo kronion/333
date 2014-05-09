@@ -16,7 +16,8 @@ div.pure-g-r.banner
           span
             a.fui-list(href='/')
       div.search
-        h2.pure-hidden-phone=title
+        h2.pure-hidden-phone
+          a(href='/')= title
         h2.pure-hidden-desktop.pure-hidden-tablet C
         form#searchform.pure-form.pure-hidden-mini(method='get')
           input#autocomplete.input.pure-input-1-4(type='text' name='search' placeholder='Looking for something?')

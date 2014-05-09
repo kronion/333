@@ -171,19 +171,21 @@ module.exports = function (client, cql) {
                           rows = result.rows;
                           if (rows[0]) {
                             console.log(req.user.email);
+                            var cb =function (err) {
+                              if (err) {
+                                console.error(err);
+                              }
+                              else {
+                                console.log('Successfully inserted into followees timeline');
+                              }
+                            };
                             for (var i = 0; i < rows.length; i++) {
                               query = 'INSERT INTO timeline (user_id, user_link_id, owner_id, owner_first_name, owner_last_name, owner_email, url, img_url, descrip) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
                               params = [rows[i].followee_id, user_link_id, req.user.user_id, req.user.first_name, req.user.last_name, req.user.email, url, img_url, descrip];
                               client.execute(query, params,
                                              cql.types.consistencies.one,
-                                             function(err) {
-                                if (err) {
-                                  console.error(err);
-                                }
-                                else {
-                                  console.log('Successfully inserted into followees timeline');
-                                }
-                              });
+                                             cb
+                              );
                             }
                           }
                         }
@@ -289,18 +291,21 @@ module.exports = function (client, cql) {
                   else {
                     rows = result.rows;
                     if (rows[0]) {
+                      var cb =function (err) {
+                        if (err) {
+                          console.error(err);
+                        }
+                        else {
+                          console.log('Followees timeline updated with NEW link');
+                        }
+                      };
                       for (var i = 0; i < rows.length; i++) {
                         query = 'INSERT INTO timeline (user_id, user_link_id, owner_id, owner_first_name, owner_last_name, owner_email, url, img_url, descrip) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
-                              params = [rows[i].followee_id, user_link_id, req.user.user_id, req.user.first_name, req.user.last_name, req.user.email, url, img_url, descrip];
-                        client.executeAsPrepared(query, params, cql.types.consistencies.one,
-                                                 function(err) {
-                          if (err) {
-                            console.error(err);
-                          }
-                          else {
-                            console.log('Followees timeline updated with NEW link');
-                          }
-                        });
+                        params = [rows[i].followee_id, user_link_id, req.user.user_id, req.user.first_name, req.user.last_name, req.user.email, url, img_url, descrip];
+                        client.executeAsPrepared(query, params, 
+                                                 cql.types.consistencies.one,
+                                                 cb
+                        );
                       }
                     }
                   }

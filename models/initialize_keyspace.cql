@@ -1,7 +1,7 @@
-CREATE KEYSPACE IF NOT EXISTS "getchive"
+CREATE KEYSPACE IF NOT EXISTS "chive"
   WITH REPLICATION = {'class': 'SimpleStrategy', 'replication_factor': 1};
 
-USE getchive;
+USE chive;
 
 CREATE TABLE IF NOT EXISTS users (
   user_id uuid PRIMARY KEY,
