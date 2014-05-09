@@ -24,38 +24,38 @@ module.exports = function(client, cql) {
               dict.url = rows[i].url;
               dict.image = rows[i].img_url;
               dict.descrip = rows[i].descrip;
-              dict.title = rows[i].title
+              dict.title = rows[i].title;
               json[i] = dict;
               links[i] = rows[i].url;
               image_sources[i] = rows[i].img_url;
             }
-            query = 'SELECT dateOf(user_link_id) FROM timeline where user_id =?';
-            params = [req.user.user_id];
-            client.executeAsPrepared(query, params, cql.types.consistencies.one, 
-                                     function(err, result) {
-              if (err) {
-                 console.log(err);
-              }
-              else {
-                var rows = result.rows;
-                if (rows[0]) {
-                  var queue = new PriorityQueue(function(a, b) {
-                    return a.timedecay - b.timedecay;
+          }
+          query = 'SELECT dateOf(user_link_id) FROM timeline where user_id =?';
+          params = [req.user.user_id];
+          client.executeAsPrepared(query, params, cql.types.consistencies.one, 
+                                   function(err, result) {
+            if (err) {
+               console.log(err);
+            }
+            else {
+              var rows = result.rows;
+              if (rows[0]) {
+                var queue = new PriorityQueue(function(a, b) {
+                  return a.timedecay - b.timedecay;
+                });
+                for (var i = 0; i < rows.length; i++) {
+                  timedecay[i] = 1/(Date.now() - rows[i]['dateOf(user_link_id)']);
+                  queue.enq({timedecay: timedecay[i], 
+                             link: links[i], 
+                             image: image_sources[i]
                   });
-                  for (var i = 0; i < rows.length; i++) {
-                    timedecay[i] = 1/(Date.now() - rows[i]['dateOf(user_link_id)']);
-                    queue.enq({timedecay: timedecay[i], 
-                               link: links[i], 
-                               image: image_sources[i]
-                    });
-                  }
                 }
               }
-            });
-            res.render('home.jade', { user: req.user, 
-                                      json: json
-            });
-          }
+            }
+          });
+          res.render('home.jade', { user: req.user, 
+                                    json: json
+          });
         }
       });
     }
