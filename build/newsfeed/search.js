@@ -4,7 +4,7 @@ $(function() {
     for (var i = 0; i < data.length; i++) {
       myvar.push(data[i]);
     }
-  })
+  });
   $( "#autocomplete" ).autocomplete({
     source: myvar,
   });

@@ -20,7 +20,7 @@ html(lang="en")
                 a(href='https://localhost:8443/pages/'+item.id) #{user}
               h2= item.title
               a(href=item.url style="")
-                img(src=item.image, height='200', width='400')
+                div(style='height: 200px; width: 400px; background-image: url(#{item.image}); background-size: cover; background-position: center')
               p=item.descrip
               div(id="shown_first" style="display:inline")
                 a(href=item.url class="archive" id="archive"+item.id style="cursor:pointer" onclick="toggle_text('shown_first', 'hidden_first')").
