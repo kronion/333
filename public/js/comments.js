@@ -1,25 +1,32 @@
-/** @jsx React.DOM */
-
 var Comment = React.createClass({
   render: function() {
     return (
-      <div className="comment">
-        <span className="commentAuthor">
-          {this.props.author + " "}
-        </span>
-        <span className="actualComment" dangerouslySetInnerHTML={{__html: this.props.children.toString()}} />
-      </div>
+      React.DOM.div( { className: 'comment' },
+        React.DOM.span( { className: 'commentAuthor' },
+          this.props.author + ' '
+        ),
+        React.DOM.span( { className: 'actualComment' },
+          this.props.children
+        )
+      )
     );
   }
 });
 
-// FIND WAY TO COMBINE THIS WITH ABOVE FOR AUTHOR + COMMENT TEXT
 var CommentList = React.createClass({
   render: function() {
     var commentNodes = this.props.data.map(function (comment, index) {
-      return <Comment key={index} author={comment.author}>{comment.text}</Comment>;
+      return (
+        Comment( { key: index, author: comment.author },
+          comment.text
+        )
+      );
     });
-    return <div className="commentList">{commentNodes}</div>;
+    return (
+     React.DOM.div( { className: 'commentList' },
+       commentNodes
+     )
+   );
   }
 });
 
@@ -54,17 +61,17 @@ var CommentBox = React.createClass({
   },
   render: function() {
     return (
-      <div className="commentBox">
-        <h3>Comments</h3>
-        <div className="scrollingPadding">
-          <div className="scrollingComments">
-            <CommentList data={this.state.data} />
-          </div>
-          <div className="newCommentPadding">
-            <CommentForm onCommentSubmit={this.handleCommentSubmit} />
-          </div>
-        </div>
-      </div>
+      React.DOM.div( { className: 'commentBox' },
+        React.DOM.h3( {}, 'Comments' ),
+        React.DOM.div( { className: 'scrollingPadding' },
+          React.DOM.div( { className: 'scrollingComments' },
+            CommentList( { data: this.state.data } )
+          ),
+          React.DOM.div( { className: 'newCommentPadding' },
+            CommentForm( { onCommentSubmit: this.handleCommentSubmit })
+          )
+        )
+      )
     );
   }
 });
@@ -79,10 +86,10 @@ var CommentForm = React.createClass({
 
   render: function() {
     return (
-      <form className="pure-form" onSubmit={this.handleSubmit}>
-        <input size="30" type="text" placeholder="Say something..." ref="text" />
-        <input className="pure-button button-primary" type="submit" value="Post" />
-      </form>
+      React.DOM.form( { classname: 'pure-form', onSubmit: this.handleSubmit },
+        React.DOM.input( { size: '30', type: 'text', placeholder: 'Say something...', ref: 'text' }),
+        React.DOM.input( { className: 'pure-button button-primary', type: 'submit', value: 'Post' })
+      )
     );
   }
 });
@@ -91,6 +98,6 @@ var myScript = document.getElementById('myScript');
 var myId = myScript.parentNode.id;
 
 React.renderComponent(
-  <CommentBox url={"/comments/"+myId} pollInterval={2000} />,
+  CommentBox( { url: '/comments/' + myId, pollInterval: 2000 }),
   document.getElementById(myId)
 );
