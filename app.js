@@ -108,9 +108,9 @@ var footer = require('./routes/footer.js')();
 
 app.get('/', home);
 
-app.post('/addFollower', followers.addFollower);
+app.post('/addFollower/:user_id', followers.addFollower);
 
-app.post('/removeFollower', followers.removeFollower);
+app.post('/removeFollower/:user_id', followers.removeFollower);
 
 // app.post('/removeLink', followers.removeLink);
 
@@ -139,11 +139,7 @@ app.get('/verify/:email/:ver_code', function (req, res) {
           res.render('verified.jade', {text: text});
         }
         else {
-          if (rows[0].ver_code !== req.params.ver_code) {
-            text = 'Your verification code does not match!';
-            res.render('verified.jade', {text: text});
-          }
-          else {
+          if (rows[0].ver_code === req.params.ver_code) {
             query = 'UPDATE users SET verified=? WHERE user_id=?';
             params = [true, rows[0].user_id];
             client.executeAsPrepared(query, params, cql.types.consistencies.one, function (err) {
@@ -155,6 +151,10 @@ app.get('/verify/:email/:ver_code', function (req, res) {
                 res.render('verified.jade', {text: text});
               }
             });
+          }
+          else {
+            text = 'Your verification code does not match!';
+            res.render('verified.jade', {text: text});
           }
         }
       }
@@ -391,65 +391,6 @@ app.post('/comments/:id', function(req, res) {
   });
 });
 
-/* This section is for commenting capabilities */
-app.get('/comments/:id', function(req, res) {
-  var comments = [];
-  var query = 'SELECT * FROM comments WHERE user_link_id=?';
-  var params = [req.params.id];
-  client.executeAsPrepared(query, params, cql.types.consistencies.one, function(err, result) {
-    if (err) {
-      console.log(err);
-    }
-    else {
-      var rows = result.rows;
-      if (rows) {
-        for (var i = 0; i < rows.length; i++) {
-          var dict = {};
-          dict.author = rows[i].author;
-          dict.text = rows[i].body;
-          comments[i] = dict;
-        }
-      }
-      res.setHeader('Content-Type', 'application/json');
-      res.send(JSON.stringify(comments));
-    }
-  });
-});
-
-app.post('/comments/:id', function(req, res) {
-  var comment_id = cql.types.timeuuid();
-  var query = 'INSERT INTO comments (user_link_id, comment_id, user_id, author, body) values (?,?,?,?,?)';
-  var params = [req.params.id, comment_id, req.user.user_id, req.user.email, req.body.text];
-  client.executeAsPrepared(query, params, cql.types.consistencies.one, function(err) {
-    if (err) {
-      console.log(err);
-    }
-    else {
-      var comments = [];
-      var query = 'SELECT * FROM comments WHERE user_link_id=?';
-      var params = [req.params.id];
-      client.executeAsPrepared(query, params, cql.types.consistencies.one, function(err, result) {
-        if (err) {
-          console.log(err);
-        }
-        else {
-          var rows = result.rows;
-          if (rows) {
-            for (var i = 0; i < rows.length; i++) {
-              var dict = {};
-              dict.author = rows[i].author;
-              dict.text = rows[i].body;
-              comments[i] = dict;
-            }
-          }
-          res.setHeader('Content-Type', 'application/json');
-          res.send(JSON.stringify(comments));
-        }
-      });
-    }
-  });
-});
-
 app.get('/autocomp', function(req,res) {
   var search =[];
   var query = 'SELECT email FROM users';
@@ -459,7 +400,7 @@ app.get('/autocomp', function(req,res) {
     }
     else {
       var rows = result.rows;
-      if (rows) {
+      if (rows[0]) {
         for (var i = 0; i < rows.length; i++) {
           search[i] = rows[i].email;
         }
@@ -468,8 +409,6 @@ app.get('/autocomp', function(req,res) {
     }
   });
 });
-
-app.get('')
 
 /* Create HTTP and HTTPS servers with Express object */
 var httpServer = http.createServer(app);
