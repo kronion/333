@@ -1,0 +1,17 @@
+doctype html
+html(lang='en')
+  head
+    meta(http-equiv='content-type' content='text/html' charset='utf-8')
+    meta(name='viewport' content='width=device-width')
+    link(rel='stylesheet' type='text/css' href='css/style.css')
+    title=title
+  body
+    include flash
+    div.banner
+      h1.left Blabrr
+      form.right(action='/login' method='post')
+        input(type='text' name='username' placeholder='username' autofocus=true required=true)
+        input(type='password' name='password' placeholder='password' required=true)
+        input(type='submit' value='Submit')
+    a(href='signup.html') Sign up here
+    include scripts

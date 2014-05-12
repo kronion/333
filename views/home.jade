@@ -1,0 +1,20 @@
+doctype html
+html(lang="en")
+  head
+    title="COS 333 Project"
+  body
+    h1 "Welcome to our COS 333 project"
+
+    form.right(action='/' method='post')
+      input(type='text' name='addFollower' placeholder='AddFollower Here' autofocus=true required=true)
+      input(type='submit' value='Submit')
+
+    form.right(action='/' method='post')
+      input(type='text' name='removeFollower' placeholder='RemoveFollower Here' autofocus=true required=true)
+      input(type='submit' value='Submit')
+
+    form.right(action='/' method='post')
+      input(type='url' name='addLink' placeholder='AddLink Here' autofocus=true required=true)
+      input(type='submit' value='Submit')
+
+    a(href='/logout') Logout

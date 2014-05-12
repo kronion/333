@@ -1,0 +1,10 @@
+if flash
+  div.flash-container
+    if flash.error
+      div.flash.error
+        div.flash-inner
+          each error in flash.error
+            h5.left=error
+          div.close(onclick='$(".flash-container").remove()')
+            h5.right X
+      div.flash-spacing
