@@ -1,7 +1,7 @@
 doctype html
 html(lang="en")
   head
-    include page_head
+    include base_head
   body
     include banner
     div.content
@@ -34,9 +34,8 @@ html(lang="en")
               a(href=item.url)
                 div(style='height: 200px; width: 400px; background-image: url(#{item.image}); background-size: cover; background-position: center')
               p=item.descrip
-
           div.rightsidehome
-            div(id=item.id)
-              script(id='myScript', type='text/jsx', src='../js/comments.js')
+            div.reactScript(id=item.id)
+              script(id='myScript', type='application/javascript', src='/js/loader.js')
         div.spaceinbetween
-    include page_scripts
+    script(type='application/javascript' src='/js/pages.js')

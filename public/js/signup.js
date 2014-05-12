@@ -23,7 +23,7 @@ $('#signup').submit(function(e) {
   var inputs = $('#signup input');
   var values = {};
   inputs.each(function() {
-    values.this.name = $(this).val();
+    values[this.name] = $(this).val();
   });
   delete values[''];
 

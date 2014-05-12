@@ -6,6 +6,10 @@ module.exports = function(grunt) {
         // Necessary to post-process with minifier
         separator: ';'
       },
+      comments: {
+        src: ['build/comments/*.js'],
+        dest: 'public/js/loader.js'
+      },
       front: {
         src: ['build/front/*.js'],
         dest: 'public/js/front.js'
@@ -25,7 +29,7 @@ module.exports = function(grunt) {
     },
     jshint: {
       options: {
-        ignores: ['build/**/0.js', 'build/**/react-0.10.min.js', 'build/**/jsx-0.10.js', 'build/**/jquery-ui-1.10.4.custom.js', 'build/**/comments.js']
+        ignores: ['build/**/0-jquery.1.10.2.min.js', 'build/**/1-react.0.10.min.js', 'build/**/jquery-ui-1.10.4.custom.js']
       },
       files: ['*.js', 'models/*.js', 'build/**/*.js', 'routes/*.js'],
     },
