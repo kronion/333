@@ -127,7 +127,7 @@ Discussed necessary design decisions:
 <p>Collin and Jennie met to discuss general feel and look of front-end. Want to be simplicitic and not distracting. Looked at inspriation from Facebook, Tumblr, Twitter, YouTube, etc. Don't want to use blue, think very overused.</p>
 
 <h2>April 8</h2>
-<p>Researched how to buil da Chrome extension. Found out about bookmarklets which can be used on any browser. Started working on coding that.</p>
+<p>Researched how to build a Chrome extension. Found out about bookmarklets which can be used on any browser. Started working on coding that.</p>
 
 <h2>April 9</h2>
 <p>Changed database from being a user object wiht follower/followee set because this is hard to iterate through within the tables. Moved to separate tables for better scalability.</p>
@@ -149,10 +149,10 @@ Currently, the URL submit assumes that you already have an "HTTP" at the beginni
 <p>Continued to work on the navigation bar and also switched from HTML/CSS to Jade/LESS, making things easier to write and also in preparation for our homepage.</p>
 
 <h2>April 14</h2>
-<p>Started a backend overhaul, moving from a push to a pull model for easier implementation. Might make things a bit slower, but that's okay for us and for demo purposes. Makes for an easier, cleaner implementation. Worked on the follower/followee list.</p>
+<p>Started a backend overhaul, moving from a pull to a push model for easier implementation. Might make things a bit slower, but that's okay for us and for demo purposes. Makes for an easier, cleaner implementation. Worked on the follower/followee list.</p>
 
 <h2>April 15</h2>
-<p>Finished the bookmarklet, save for a few parts that will need to be finialized when we have the final product. Continued working on Facebook integration and uitilizing the API and information we get from them.</p>
+<p>Finished the bookmarklet - simply makes a hidden iframe with the source set to make a GET request. Just needs to work on styling of bookmarklet. Continued working on Facebook integration and uitilizing the API and information we get from them.</p>
 
 <h2>April 17</h2>
 <p>Started to think about the recommendation algorithm, should we have time to work on it. Discussed additional features for the website such as a drag and drop feature to take newsfeed links and archive them and making a footer for all pages.</p>
@@ -167,7 +167,7 @@ Currently, the URL submit assumes that you already have an "HTTP" at the beginni
 <p>Made our own website scrapper to grab title, images, first paragraph, etc. We were going to someone else's code but would have had to start paying after a small amount of usage.</p>
 
 <h2>April 22</h2>
-<p>Bookmarklet pretty much finalized. Continued work on comments, almost finished, just need a little more work. Should be like real-time, Facebook commenting when finished.</p>
+<p>Bookmarklet no longer works after pulling in new code and the revised database schema - can no longer use GET request. Continued work on comments, almost finished, just need a little more work. Should be like real-time, Facebook commenting when finished.</p>
 
 <h2>April 23</h2>
 <p>Finished navbar, part of profile page, error in login, and login page. Talked about a unified format for all pages so that there aren't big differences.</p>
@@ -175,7 +175,10 @@ Currently, the URL submit assumes that you already have an "HTTP" at the beginni
 <h2>April 25</h2>
 <p>Another weekly meeting. Dicussed our goals for the final project, now that we're two weeks away from demo day! Want to get social features working and a possibly primitive searching function. Continuing to make website pages such as settings and profile.</p>
 
-
+<h2>April 30th</h2>
+<p>Trying to figure out a way to make a POST request from another site for bookmarklet. Looking into request module. Unfortunate that the app no longer runs on VM - symlinks in shared folders don't work. </p><h2>April 30th</h2>
+<p>Trying to figure out a way to make a POST request from another site for bookmarklet. Looking into request module. Unfortunate that the app no longer runs on VM - symlinks in shared folders don't work. </p><h2>April 30th</h2>
+<p>Trying to figure out a way to make a POST request from another site for bookmarklet. Looking into request module. Unfortunate that the app no longer runs on VM - symlinks in shared folders don't work. </p>
       </section>
 
     </div>
