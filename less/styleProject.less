@@ -313,9 +313,20 @@ hr {
   font-family: 'Helvetica', 'Arial', sans-serif;
 }
 
+.about-font {
+  font-size: 15px;
+  margin: 0;
+}
+
 .blue-link {
   color: #0080ff;
   font-size: 30px;
+  cursor: pointer;
+}
+
+.grey-link {
+  color: #CAD9C8;
+  font-size: 20px;
   cursor: pointer;
 }
 
@@ -353,6 +364,25 @@ hr {
   background-color: @grey-primary;
   color: black;
   width: 100%;
+  background-image:
+    radial-gradient(
+      @grey-secondary,
+      @grey-primary);
+}
+
+.grey-secondary{
+  background-color: @grey-secondary;
+  color:black;
+  width: 100%;
+}
+
+.hr{
+  border: 0;
+  height: 1px;
+  background-image: -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); 
+  background-image:    -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); 
+  background-image:     -ms-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); 
+  background-image:      -o-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); 
 }
 
 /*----------------------------------------------------------------------------*/
