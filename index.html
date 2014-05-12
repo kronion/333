@@ -50,20 +50,132 @@ Jennie Werner<br>
 Jeffrey Yan<br>
 Glenna Yu  </p>
 
-<h2>
-<a name="module-installation" class="anchor" href="#module-installation"><span class="octicon octicon-link"></span></a>Module installation</h2>
+<h2>March 10</h2>
+<p>Met to discuss possible project ideas. Landed on a link-sharing website with a social media aspect. The basis for our idea coming from the fact that we like all the links/news/etc. posted on Facebook, but it’s very hard to find again.</p>
 
+<h2>March 11</h2>
+<p>Collin wrote and shared a set-up guide with instructions for setting up a Github repository and we all practiced pushing and making pull requests.</p>
+
+<h2>March 13</h2>
+<p>Met to discuss the finer points of our project (general layout, database setup) and plans for over spring break. Began writing design document.</p>
+
+<h2>March 16</h2>
+<p>Finished up design document on Google Docs. Made a very rough plan for database and front-end design.</p>
+
+<h2>March 17</h2>
+<p> Module installation and dependencies worked on.</p>
 <p>The <code>node_modules</code> directory has not been committed. To install dependencies, simply run <code>npm install</code>. We ensure that all modules and submodules have interoperable versions using <code>npm-shrinkwrap.json</code>. To learn more about this system, <a href="http://blog.nodejs.org/2012/02/27/managing-node-js-dependencies-with-shrinkwrap/">read this short article.</a></p>
 
-<h2>
-<a name="developer-tools" class="anchor" href="#developer-tools"><span class="octicon octicon-link"></span></a>Developer tools</h2>
+<h2>March 18</h2>
+<p>A <code>Gruntfile.js</code> script has been included to automate basic tasks like linting Javascript and updating <code>npm-shrinkwrap.json</code> when new modules are installed. Simply install the <code>grunt</code> command <a href="http://gruntjs.com/getting-started#installing-the-cli">using these instructions</a> and run <code>grunt watch</code> either in the background or in a separate terminal window.</p>
 
+<h2>March 19</h2>
+<p>HSTS effectiveness has not been verified. It seems it only works for ports 80 and 443, so we must deploy in order to test.</p>
+<p>Hash passwords serverside.</p>
+
+<h2>March 20</h2>
+<p>No check to ensure that DB 'SELECT' returns a single row. We should probably check even if we believe this is ensured. Could eventual consistenc issues allow two users to create colliding accounts?</p>
+<p>Use QUORUM, must set this up.</p>
+<p>Add check to make sure username doesn't already exist</p>
+<p>Gruntfile is broken?</p>
+
+<h2>March 22</h2>
+<p>Database (Cassandra) set up in its most basic form.</p>
+
+<h2>March 23</h2>
+<p>Server set up.</p>
+
+<h2>March 28</h2>
+<p>Met to discuss all that has happened over break. Divided up tasks for next few weeks.
 <ul>
-<li>A <code>Gruntfile.js</code> script has been included to automate basic tasks like linting Javascript and updating <code>npm-shrinkwrap.json</code> when new modules are installed. Simply install the <code>grunt</code> command <a href="http://gruntjs.com/getting-started#installing-the-cli">using these instructions</a> and run <code>grunt watch</code> either in the background or in a separate terminal window.</li>
-</ul><h2>
-<a name="cassandra-setup" class="anchor" href="#cassandra-setup"><span class="octicon octicon-link"></span></a>Cassandra setup</h2>
+  <li>User Interface: Jennie</li>
+  <li>Database Collection: Glenna</li>
+  <li>Middleware: Erik and Jeffery</li>
+</ul>
+Discussed necessary design decisions:
+<ul>
+  <li> Friends vs. followers and the addition of mutual followers with commenting power</li>
+  <li> Possibility of Chrome extensions</li>
+  <li> Connecting with Facebook </li>
+  <li> HTTPS support through Princetton? Need to research </li>
+</ul>
+</p>
 
-<p>COMING SOON!</p>
+<h2>March 30</h2>
+<p>Started work on login page (basing it a bit on Facebook's login page. Started work on adding routes from database to front-end.</p>
+
+<h2>March 31</h2>
+<p>Sent out Google survey to try and get some data (with tags) for newsfeed operations testing.</p>
+
+<h2>April 1</h2>
+<p>Continued work on login page, downloaded and utilized Flat UI (and by extension Bootstrap) to make look more modern.</p>
+
+<h2>April 2</h2>
+<p>Scrapped some websites to get more data for testing.</p>
+
+<h2>April 3</h2>
+<p>Finished up routes for posting links/media, still need to implement the ability to see what you’ve saved (hoping to get this by next week). Finished a rough version of login page (color and style to be determined later)</p>
+
+<h2>April 4</h2>
+<p>Discussed push notification system (asked in class about Facebook’s algorithm for news feeds) and how we want to implement our own newsfeed. Pros and cons to different versions.</p>
+<p>Continued discussion about database schema and who we could contact about it (best practices for Cassandra, etc.)</p>
+
+<h2>April 5</h2>
+<p>Worked on database functionality and implementing the ability to store and retrieve links in a very primitive “profile page.”</p>
+
+<h2>April 6</h2>
+<p>Collin and Jennie met to discuss general feel and look of front-end. Want to be simplicitic and not distracting. Looked at inspriation from Facebook, Tumblr, Twitter, YouTube, etc. Don't want to use blue, think very overused.</p>
+
+<h2>April 8</h2>
+<p>Researched how to buil da Chrome extension. Found out about bookmarklets which can be used on any browser. Started working on coding that.</p>
+
+<h2>April 9</h2>
+<p>Changed database from being a user object wiht follower/followee set because this is hard to iterate through within the tables. Moved to separate tables for better scalability.</p>
+
+<h2>April 10</h2>
+<p>Finished a basic version of the homepage and login page and a universal top bar. Researched and started the implementation for a Facebook login option.</p>
+
+<h2>April 11</h2>
+<p>Met for our weekly meeting. Discussed everything that had happened next week and made goals for next week.
+<ul>
+  <li>Finalize home and profile views</li>
+  <li>Hook up profiles with buttons, etc.</li>
+  <li>Finish bookmarklet.</li>
+</ul>
+Currently, the URL submit assumes that you already have an "HTTP" at the beginning, need to make sure we're thinking about input checking. Also need to consider other authentication stuff.
+</p>
+
+<h2>April 13</h2>
+<p>Continued to work on the navigation bar and also switched from HTML/CSS to Jade/LESS, making things easier to write and also in preparation for our homepage.</p>
+
+<h2>April 14</h2>
+<p>Started a backend overhaul, moving from a push to a pull model for easier implementation. Might make things a bit slower, but that's okay for us and for demo purposes. Makes for an easier, cleaner implementation. Worked on the follower/followee list.</p>
+
+<h2>April 15</h2>
+<p>Finished the bookmarklet, save for a few parts that will need to be finialized when we have the final product. Continued working on Facebook integration and uitilizing the API and information we get from them.</p>
+
+<h2>April 17</h2>
+<p>Started to think about the recommendation algorithm, should we have time to work on it. Discussed additional features for the website such as a drag and drop feature to take newsfeed links and archive them and making a footer for all pages.</p>
+
+<h2>April 18</h2>
+<p>Another weekly meeting. Discussed changing our name from "Blabrr" since that's hard to spell and seems to counterintuittive to what we want this project to be about. Talked about how we want to work on the "social" aspect, such as commenting and liking different links. Also discussed our newsfeed ranking and our ideas for that. We are probably going to do a Twitter/edge rank algorithm with an exponential decay, plus utilize the comments.</p>
+
+<h2>April 19</h2>
+<p>Pulled in and worked on merging all the different portions of code on different computers. Working on fixing merge conflicts.</p>
+
+<h2>April 20</h2>
+<p>Made our own website scrapper to grab title, images, first paragraph, etc. We were going to someone else's code but would have had to start paying after a small amount of usage.</p>
+
+<h2>April 22</h2>
+<p>Bookmarklet pretty much finalized. Continued work on comments, almost finished, just need a little more work. Should be like real-time, Facebook commenting when finished.</p>
+
+<h2>April 23</h2>
+<p>Finished navbar, part of profile page, error in login, and login page. Talked about a unified format for all pages so that there aren't big differences.</p>
+
+<h2>April 25</h2>
+<p>Another weekly meeting. Dicussed our goals for the final project, now that we're two weeks away from demo day! Want to get social features working and a possibly primitive searching function. Continuing to make website pages such as settings and profile.</p>
+
+
       </section>
 
     </div>
