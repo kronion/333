@@ -104,27 +104,37 @@ app.locals({
 });
 
 /* Routing */
-var home = require('./routes/home.js')(client, cql);
 var followers = require('./routes/followers.js')(client, cql);
-var pages = require('./routes/pages.js')(client, cql);
 var footer = require('./routes/footer.js')();
+var home = require('./routes/home.js')(client, cql);
+var pages = require('./routes/pages.js')(client, cql);
+var upload = require('./routes/upload.js')(app, client, cql, strings);
 
+/* Home */
 app.get('/', home);
-
-app.post('/addFollower/:user_id', followers.addFollower);
-
-app.post('/removeFollower/:user_id', followers.removeFollower);
-
-// app.post('/removeLink', followers.removeLink);
-
-app.post('/addLink', followers.addLink);
-
-app.get('/pages/:user_id', pages);
 
 /* Footer routes */
 app.get('/about', footer.about);
 app.get('/contact', footer.contact);
 app.get('/help', footer.help);
+
+/* Add follower */
+app.post('/addFollower/:user_id', followers.addFollower);
+
+/* Remove follower */
+app.post('/removeFollower/:user_id', followers.removeFollower);
+
+/* Add link */
+app.post('/addLink', followers.addLink);
+
+/* Remove link */
+// app.post('/removeLink', followers.removeLink);
+
+/* Profile pages */
+app.get('/pages/:user_id', pages);
+
+/* Profile picture upload */
+app.post('/upload/image/:user_id', upload.image);
 
 app.get('/verify/:email/:ver_code', function (req, res) {
   var query = 'SELECT * FROM users where email=?';
@@ -266,79 +276,6 @@ app.post('/signup', function(req, res) {
       }
     }
   });
-});
-
-app.post('/upload/image/:user_id', function (req, res) {
-  // Check that the post request was made by the user it affects
-  if (req.user.user_id !== req.params.user_id) {
-    // I think this will just stop fraudulent requests cold?
-    res.end();
-  }
-  else {
-    req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-      // Check that the user posted an appropriate photo
-      if (mimetype !== 'image/gif' && mimetype !== 'image/jpeg' &&
-          mimetype !== 'image/png') {
-        // Again, clobber fraudulent requests
-        res.end();
-      }
-      else {
-        // Delete old image if it exists
-        var query = 'SELECT image FROM users WHERE user_id=?';
-        var params = [req.params.user_id];
-        client.executeAsPrepared(query, params, cql.types.consistencies.one,
-                                 function (err, result) {
-          if (err) {
-            console.log(err);
-          }
-          else {
-            var image = result.rows[0].image;
-            if (image && image !== strings.anonymous) {
-              knoxclient.deleteFile(image.substring(image.indexOf('/', 8)),
-                                    function (err, res) {
-                if (err) {
-                  console.log(err);
-                }
-                else {
-                  res.resume();
-                }
-              });
-            }
-          }
-        });
-        var UploadStreamObject = new Uploader(
-          uploadCreds,
-          {
-            'Bucket': 'chive',
-            'Key': req.user.user_id + Math.round(Math.random() * 1000000),
-            'ACL': 'public-read'
-          },
-          function (err, uploadStream) {
-            if (err) {
-              console.log(err, uploadStream);
-            }
-            else {
-              uploadStream.on('uploaded', function (data) {
-                var query = 'UPDATE users SET image=? WHERE user_id=?';
-                var params = [data.Location, req.params.user_id];
-                client.executeAsPrepared(query, params, cql.types.consistencies.one,
-                                         function (err) {
-                  if (err) {
-                    console.log(err);
-                  }
-                  else {
-                    res.send(data.Location);
-                  }
-                });
-              });
-              file.pipe(uploadStream);
-            }
-          }
-        );
-      }
-    });
-    req.pipe(req.busboy);
-  }
 });
 
 /* This section is for commenting capabilities */
