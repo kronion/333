@@ -1,7 +1,7 @@
 /* Strings */
 var strings = require('../strings.js');
 
-module.exports = function(app, client, cql) {
+module.exports = function(app, client, cql, bcrypt) {
   /* Passport */
   var passport = require('passport');
   var LocalStrategy = require('passport-local').Strategy;
@@ -19,13 +19,18 @@ module.exports = function(app, client, cql) {
         if (!user.rows[0]) {
           return done(null, false, { 'message': strings.incorrect_username });
         }
-        if (user.rows[0].password !== password) {
-          return done(null, false, { 'message': strings.incorrect_password });
-        }
-        if (user.rows[0].verified === false) {
-          return done(null, false, { 'message': strings.unverified });
-        }
-        return done(null, user.rows[0]);
+        bcrypt.compare(password, user.rows[0].password, function (err, res) {
+          if (err) {
+            return done(err);
+          }
+          if (!res) {
+            return done(null, false, { 'message': strings.incorrect_password });
+          }
+          if (user.rows[0].verified === false) {
+            return done(null, false, { 'message': strings.unverified });
+          }
+          return done(null, user.rows[0]);
+        });
       });
     }
   ));

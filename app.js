@@ -89,8 +89,11 @@ app.use(flash());
 app.use(express.compress());
 app.use(express.static(__dirname + '/public'));
 
+/* bcrypt for password encryption */
+var bcrypt = require('bcrypt');
+
 /* Passport */
-var passport = require('./routes/authenticate.js')(app, client, cql);
+var passport = require('./routes/authenticate.js')(app, client, cql, bcrypt);
 
 /* Jade templating */
 app.set('views', path.join(__dirname, 'views'));
@@ -233,26 +236,32 @@ app.post('/signup', function(req, res) {
         res.send(response);
       }
       else {
-        query = 'INSERT INTO users (user_id, email, first_name, image, last_name, password, ver_code, verified) values (?,?,?,?,?,?,?,?)';
-        params = [user_id, req.body.email, req.body.first_name, strings.anonymous,
-                  req.body.last_name, req.body.password, ver_code, false];
-        client.executeAsPrepared(query, params, cql.types.consistencies.one, function (err) {
+        bcrypt.hash(req.body.password, 10, function (err, hash) {
           if (err) {
             console.log(err);
           }
-          else {
-            app.mailer.send('email', {
-              to: req.body.email,
-              subject:  'Welcome to \'Chive',
-              ver_code: ver_code
-            }, function (err) {
-              if (err) {
-                console.error(err);
-              }
-            });
-            response.value=3;
-            res.send(response);
-          }
+          query = 'INSERT INTO users (user_id, email, first_name, image, last_name, password, ver_code, verified) values (?,?,?,?,?,?,?,?)';
+          params = [user_id, req.body.email, req.body.first_name, strings.anonymous,
+                    req.body.last_name, hash, ver_code, false];
+          client.executeAsPrepared(query, params, cql.types.consistencies.one, 
+                                   function (err) {
+            if (err) {
+              console.log(err);
+            }
+            else {
+              app.mailer.send('email', {
+                to: req.body.email,
+                subject:  'Welcome to \'Chive',
+                ver_code: ver_code
+              }, function (err) {
+                if (err) {
+                  console.error(err);
+                }
+              });
+              response.value=3;
+              res.send(response);
+            }
+          });
         });
       }
     }
