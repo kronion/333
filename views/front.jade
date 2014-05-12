@@ -11,7 +11,7 @@ html(lang='en')
         div(style='text-align: center')
           h2(style='font-size: 50px').
             Log In
-          form.pure-form(action='/login' method='post')
+          form.pure-form.validate-form(action='/login' method='post')
             p
               input.input(type='text' name='email' placeholder='email' autofocus=true required=true)
             p
@@ -35,7 +35,7 @@ html(lang='en')
             h1.
               Sign Up Here!
             hr
-            form#signup.pure-form.pure-form-aligned(action='/signup' method='post')
+            form#signup.pure-form.pure-form-aligned.validate-form(action='/signup' method='post')
               fieldset
                 label(for='first_name') First name
                 input(type='text' name='first_name' placeholder='First name' autofocus=true required=true)

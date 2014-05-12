@@ -713,6 +713,15 @@ hr {
   }
 }
 
+// Hopefully fixing the HTML5 issue with Safari
+.invalid input:required:invalid {
+    background-color: @red-secondary;
+}
+ 
+.invalid input:required:valid {
+    background-color: #2BD65B ;
+}
+
 /*----------------------------------------------------------------------------*/
 /* Footer                                                                     */
 /*----------------------------------------------------------------------------*/
