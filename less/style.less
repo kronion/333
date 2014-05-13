@@ -36,7 +36,7 @@
 
 // Blues
 @blue-primary: #388f90;
-@blue-secondary: 399b9c;
+@blue-secondary: #399b9c;
 
 // Greys
 @grey-primary: #eee;
@@ -118,6 +118,18 @@ hr {
   background-color: @grey-secondary;
 }
 
+input {
+  i-webkit-transition: border-color 0.5s ease-in;
+  -moz-transition: border-color 0.5s ease-in;
+  -ms-transition: border-color 0.5s ease-in;
+  -o-transition: border-color 0.5s ease-in;
+  transition: border-color 0.5s ease-in;
+}
+
+.pure-form .button-primary {
+  margin-left: 4px;
+}
+
 /*----------------------------------------------------------------------------*/
 /* Shorthands                                                                 */
 /*----------------------------------------------------------------------------*/
@@ -152,6 +164,13 @@ hr {
   &:hover {
     background-color: @red-primary;
   }
+}
+
+.button-disabled {
+  .button-essentials;
+  background-color: @red-secondary;
+
+  cursor: default !important;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -212,10 +231,10 @@ hr {
     .right;
     .no-margins;
     input:focus:invalid {
-      border-color: @red-secondary !important;
+      border-color: @red-secondary;
     }
     input:focus:valid {
-      border-color: @blue-primary !important;
+      border-color: @blue-primary;
     }
   }
   .input {
@@ -256,6 +275,20 @@ hr {
   margin-left: 30px;
   form {
     float: none;
+  }
+}
+
+.ui-menu-item {
+  img {
+    height: 30px;
+    width: 30px;
+    
+    margin-right: 10px;
+
+    background-size: cover;
+    background-position: center;
+
+    vertical-align: bottom;
   }
 }
 
@@ -322,6 +355,8 @@ hr {
 
   width: 980px;
   height: 45px;
+
+  margin-bottom: 15px;
 
   background-color: #fff;
   .box-shadow-primary;
@@ -420,6 +455,7 @@ hr {
   height: 130px;
   background-color: #fff;
   margin-top: -125px;
+  margin-bottom: 15px;
   .box-shadow-primary;
 }
 
@@ -438,7 +474,7 @@ hr {
   margin-bottom: 10px;
   margin-right: 10px;
 
-  a {
+  button {
     margin-left: 10px;
   }
 }
@@ -733,6 +769,29 @@ hr {
 }
 
 /*----------------------------------------------------------------------------*/
+/* Bookmarklet                                                                */
+/*----------------------------------------------------------------------------*/
+.bookmarkletCenter {
+  color: @red-secondary;
+  margin-left: 30px;
+  form {
+    float: none;
+  }
+}
+
+.bookmarkletRight {
+  float: right;
+}
+
+.bookmarkletInline {
+  margin-top: 10px;
+
+  div {
+    display: inline-block;
+  }
+}
+
+/*----------------------------------------------------------------------------*/
 /* Main Content for Standard Page                                             */
 /*----------------------------------------------------------------------------*/
 
@@ -780,6 +839,28 @@ hr {
 
 
 /*----------------------------------------------------------------------------*/
+/* Verified Page                                                              */
+/*----------------------------------------------------------------------------*/
+
+.verified {
+  background-color: white;
+  height: 200px;
+  width: 400px;
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-top: -100px;
+  margin-left: -200px;
+
+  .box-shadow-primary;
+  border-radius: 0px;
+  color: black;
+
+  padding: 10px 10px 10px 10px;
+}
+
+/*----------------------------------------------------------------------------*/
 /* Flash messages                                                             */
 /*----------------------------------------------------------------------------*/
 .error {
@@ -811,7 +892,10 @@ hr {
 
 .linkcontainer{
   width: 980px;
-  height: 400px;
+  height: 445px;
+
+  margin-bottom: 15px;
+
   background-color: white;
   .box-shadow-primary;
 
@@ -831,15 +915,11 @@ hr {
     }
 }
 
-.spaceinbetween {
-  height: 20px;
-}
-
 .leftsidehome {
   padding: 5px 5px 5px 10px;
   float: left;
   width: 55%;
-  height: 390px;
+  height: 435px;
   border-right: 2px solid #cecece;
   border-radius: 0px;
 }
@@ -908,10 +988,6 @@ hr {
 
 .fui-list:before {
   content: '\e00c';
-}
-
-.fui-new:before {
-  content: '\e00d';
 }
 
 .fui-photo:before {

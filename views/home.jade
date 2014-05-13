@@ -2,16 +2,14 @@ doctype html
 html(lang="en")
   head
     include base_head
-    script(src='js/archiveTimeline.js')
   body
     include banner
     div.content
       div.feed
         center
           form.pure-form(action='/addLink' method='post')
-            input(type='url' name='addLink' placeholder='Share this!' autofocus=true required=true style="width:400px")
-            // input.pure-button.button-primary(type='submit' value='Submit')
-      div.spaceinbetween
+            input(type='url' name='addLink' placeholder='Share this!' autofocus=true required=true style='width: 400px')
+            input.pure-button.button-primary(type='submit' value='Submit')
 
       each item in json
         - var user = item.first_name + ' ' + item.last_name
@@ -20,17 +18,15 @@ html(lang="en")
             center
               h3
                 a(href='https://localhost:8443/pages/'+item.id) #{user}
-              h2 PUT TITLE HERE
-              a(href=item.url style="")
-                img(src=item.image, height='200', width='400')
+              h2= item.title
+              a(href=item.url)
+                div(style='height: 200px; width: 400px; background-image: url(#{item.image}); background-size: cover; background-position: center')
               p=item.descrip
-              div(id="shown_first" style="display:inline")
-                a(href="#" class="archive" id="archive"+item.id style="cursor:pointer" onclick="toggle_text('shown_first', 'hidden_first')").
+              div(id="shown_first" style='display: inline')
+                a(href=item.url class='archive' id='archive'+item.id style='cursor: pointer' onclick='toggle_text("shown_first", "hidden_first")').
                   Save content!
-              div(id="hidden_first" style="display:none").
+              div(id='hidden_first' style='display: none').
                   Saved!
           div.rightsidehome
-            div(id=item.id)
-              script(id='myScript', type='text/jsx', src='js/comments.js')
-        div.spaceinbetween
-    include scripts
+            div.reactScript(id=item.id)
+    script(type='application/javascript' src='/js/newsfeed.js')

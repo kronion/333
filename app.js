@@ -88,8 +88,11 @@ app.use(flash());
 app.use(express.compress());
 app.use(express.static(__dirname + '/public'));
 
+/* bcrypt for password encryption */
+var bcrypt = require('bcrypt');
+
 /* Passport */
-var passport = require('./routes/authenticate.js')(app, client, cql);
+var passport = require('./routes/authenticate.js')(app, client, cql, bcrypt);
 
 /* request */
 var request = require('request');
@@ -103,30 +106,44 @@ app.locals({
 });
 
 /* Routing */
-var home = require('./routes/home.js')(client, cql);
 var followers = require('./routes/followers.js')(client, cql);
-var pages = require('./routes/pages.js')(client, cql);
 var bookmarklet = require('./routes/bookmarklet.js')(client, cql);
 var footer = require('./routes/footer.js')();
+var home = require('./routes/home.js')(client, cql);
+var pages = require('./routes/pages.js')(client, cql);
+var upload = require('./routes/upload.js')(app, client, cql, strings);
 
+/* Home */
 app.get('/', home);
-
-app.post('/addFollower', followers.addFollower);
-
-app.post('/removeFollower', followers.removeFollower);
-
-/* For bookmarklet purposes: adding a link via GET request */
-app.get('/bookmark/:uri_enc', bookmarklet);
-// app.post('/removeLink', followers.removeLink);
-
-app.post('/addLink', followers.addLink);
-
-app.get('/pages/:user_id', pages);
 
 /* Footer routes */
 app.get('/about', footer.about);
 app.get('/contact', footer.contact);
 app.get('/help', footer.help);
+
+/* Add follower */
+app.post('/addFollower/:user_id', followers.addFollower);
+
+<<<<<<< HEAD
+/* For bookmarklet purposes: adding a link via GET request */
+app.get('/bookmark/:uri_enc', bookmarklet);
+// app.post('/removeLink', followers.removeLink);
+=======
+/* Remove follower */
+app.post('/removeFollower/:user_id', followers.removeFollower);
+>>>>>>> 32662746681bc0b1f6a2ccb57bdb69321fd96ff0
+
+/* Add link */
+app.post('/addLink', followers.addLink);
+
+/* Remove link */
+// app.post('/removeLink', followers.removeLink);
+
+/* Profile pages */
+app.get('/pages/:user_id', pages);
+
+/* Profile picture upload */
+app.post('/upload/image/:user_id', upload.image);
 
 app.get('/verify/:email/:ver_code', function (req, res) {
   var query = 'SELECT * FROM users where email=?';
@@ -144,11 +161,7 @@ app.get('/verify/:email/:ver_code', function (req, res) {
           res.render('verified.jade', {text: text});
         }
         else {
-          if (rows[0].ver_code !== req.params.ver_code) {
-            text = 'Your verification code does not match!';
-            res.render('verified.jade', {text: text});
-          }
-          else {
+          if (rows[0].ver_code === req.params.ver_code) {
             query = 'UPDATE users SET verified=? WHERE user_id=?';
             params = [true, rows[0].user_id];
             client.executeAsPrepared(query, params, cql.types.consistencies.one, function (err) {
@@ -160,6 +173,10 @@ app.get('/verify/:email/:ver_code', function (req, res) {
                 res.render('verified.jade', {text: text});
               }
             });
+          }
+          else {
+            text = 'Your verification code does not match!';
+            res.render('verified.jade', {text: text});
           }
         }
       }
@@ -238,103 +255,39 @@ app.post('/signup', function(req, res) {
         res.send(response);
       }
       else {
-        query = 'INSERT INTO users (user_id, email, first_name, image, last_name, password, ver_code, verified) values (?,?,?,?,?,?,?,?)';
-        params = [user_id, req.body.email, req.body.first_name, strings.anonymous,
-                  req.body.last_name, req.body.password, ver_code, false];
-        client.executeAsPrepared(query, params, cql.types.consistencies.one, function (err) {
+        bcrypt.hash(req.body.password, 10, function (err, hash) {
           if (err) {
             console.log(err);
           }
           else {
-            app.mailer.send('email', {
-              to: req.body.email,
-              subject:  'Welcome to \'Chive',
-              ver_code: ver_code
-            }, function (err) {
+            query = 'INSERT INTO users (user_id, email, first_name, image, last_name, password, ver_code, verified) values (?,?,?,?,?,?,?,?)';
+            params = [user_id, req.body.email, req.body.first_name, 
+                      strings.anonymous, req.body.last_name, hash, ver_code, 
+                      false];
+            client.executeAsPrepared(query, params, cql.types.consistencies.one, 
+                                     function (err) {
               if (err) {
-                console.error(err);
+                console.log(err);
+              }
+              else {
+                app.mailer.send('email', {
+                  to: req.body.email,
+                  subject:  'Welcome to \'Chive',
+                  ver_code: ver_code
+                }, function (err) {
+                  if (err) {
+                    console.error(err);
+                  }
+                });
+                response.value=3;
+                res.send(response);
               }
             });
-            response.value=3;
-            res.send(response);
           }
         });
       }
     }
   });
-});
-
-app.post('/upload/image/:user_id', function (req, res) {
-  // Check that the post request was made by the user it affects
-  if (req.user.user_id !== req.params.user_id) {
-    // I think this will just stop fraudulent requests cold?
-    res.end();
-  }
-  else {
-    req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-      // Check that the user posted an appropriate photo
-      if (mimetype !== 'image/gif' && mimetype !== 'image/jpeg' &&
-          mimetype !== 'image/png') {
-        // Again, clobber fraudulent requests
-        res.end();
-      }
-      else {
-        // Delete old image if it exists
-        var query = 'SELECT image FROM users WHERE user_id=?';
-        var params = [req.params.user_id];
-        client.executeAsPrepared(query, params, cql.types.consistencies.one,
-                                 function (err, result) {
-          if (err) {
-            console.log(err);
-          }
-          else {
-            var image = result.rows[0].image;
-            if (image && image !== strings.anonymous) {
-              knoxclient.deleteFile(image.substring(image.indexOf('/', 8)),
-                                    function (err, res) {
-                if (err) {
-                  console.log(err);
-                }
-                else {
-                  res.resume();
-                }
-              });
-            }
-          }
-        });
-        var UploadStreamObject = new Uploader(
-          uploadCreds,
-          {
-            'Bucket': 'chive',
-            'Key': req.user.user_id + Math.round(Math.random() * 1000000),
-            'ACL': 'public-read'
-          },
-          function (err, uploadStream) {
-            if (err) {
-              console.log(err, uploadStream);
-            }
-            else {
-              uploadStream.on('uploaded', function (data) {
-                var query = 'UPDATE users SET image=? WHERE user_id=?';
-                var params = [data.Location, req.params.user_id];
-                client.executeAsPrepared(query, params, cql.types.consistencies.one,
-                                         function (err) {
-                  if (err) {
-                    console.log(err);
-                  }
-                  else {
-                    res.send(data.Location);
-                  }
-                });
-              });
-              file.pipe(uploadStream);
-            }
-          }
-        );
-      }
-    });
-    req.pipe(req.busboy);
-  }
 });
 
 /* This section is for commenting capabilities */
@@ -396,85 +349,28 @@ app.post('/comments/:id', function(req, res) {
   });
 });
 
-/* This section is for commenting capabilities */
-app.get('/comments/:id', function(req, res) {
-  var comments = [];
-  var query = 'SELECT * FROM comments WHERE user_link_id=?';
-  var params = [req.params.id];
-  client.executeAsPrepared(query, params, cql.types.consistencies.one, function(err, result) {
-    if (err) {
-      console.log(err);
-    }
-    else {
-      var rows = result.rows;
-      if (rows) {
-        for (var i = 0; i < rows.length; i++) {
-          var dict = {};
-          dict.author = rows[i].author;
-          dict.text = rows[i].body;
-          comments[i] = dict;
-        }
-      }
-      res.setHeader('Content-Type', 'application/json');
-      res.send(JSON.stringify(comments));
-    }
-  });
-});
-
-app.post('/comments/:id', function(req, res) {
-  var comment_id = cql.types.timeuuid();
-  var query = 'INSERT INTO comments (user_link_id, comment_id, user_id, author, body) values (?,?,?,?,?)';
-  var params = [req.params.id, comment_id, req.user.user_id, req.user.email, req.body.text];
-  client.executeAsPrepared(query, params, cql.types.consistencies.one, function(err) {
-    if (err) {
-      console.log(err);
-    }
-    else {
-      var comments = [];
-      var query = 'SELECT * FROM comments WHERE user_link_id=?';
-      var params = [req.params.id];
-      client.executeAsPrepared(query, params, cql.types.consistencies.one, function(err, result) {
-        if (err) {
-          console.log(err);
-        }
-        else {
-          var rows = result.rows;
-          if (rows) {
-            for (var i = 0; i < rows.length; i++) {
-              var dict = {};
-              dict.author = rows[i].author;
-              dict.text = rows[i].body;
-              comments[i] = dict;
-            }
-          }
-          res.setHeader('Content-Type', 'application/json');
-          res.send(JSON.stringify(comments));
-        }
-      });
-    }
-  });
-});
-
 app.get('/autocomp', function(req,res) {
   var search =[];
-  var query = 'SELECT email FROM users';
+  var query = 'SELECT user_id, first_name, last_name, image FROM users';
   client.executeAsPrepared(query, cql.types.consistencies.one, function(err, result) {
     if (err) {
       console.log(err);
     }
     else {
       var rows = result.rows;
-      if (rows) {
+      if (rows[0]) {
         for (var i = 0; i < rows.length; i++) {
-          search[i] = rows[i].email;
+          search[i] = {
+            label: rows[i].first_name + ' ' + rows[i].last_name,
+            user_id: rows[i].user_id,
+            image: rows[i].image 
+          };
         }
       }
       res.send(JSON.stringify(search));
     }
   });
 });
-
-app.get('')
 
 /* Create HTTP and HTTPS servers with Express object */
 var httpServer = http.createServer(app);
