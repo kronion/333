@@ -2721,7 +2721,22 @@ $('#follow').click(function(e) {
     }
   });
 });
-;$(function() {
+
+$('#followees').click(function(e) {
+  e.preventDefault();
+  var self = this;
+  $.get($(self).attr('href'), function (data) {
+    alert(data);
+  });
+});
+
+$('#followers').click(function(e) {
+  e.preventDefault();
+  var self = this;
+  $.get($(self).attr('href'), function (data) {
+    alert(data);
+  });
+});;$(function() {
   var searchCache = [];
   var id;
   $.getJSON("/autocomp", function (data) {

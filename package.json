@@ -13,6 +13,7 @@
     "url": "https://github.com/kronion/333.git"
   },
   "dependencies": {
+    "async": "^0.8.0",
     "bcrypt": "^0.7.8",
     "cheerio": "^0.15.0",
     "connect-busboy": "0.0.1",

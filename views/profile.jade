@@ -24,8 +24,8 @@ html(lang="en")
               button#follow.pure-button.button-disabled(disabled=true) Follow
             else
               button#follow.pure-button.button-primary(href='/addFollower/#{user_id}') Follow
-          button.pure-button.button-primary(href='/followees/#{user_id}') Followees
-          button.pure-button.button-primary(href='/followers/#{user_id}') Followers
+          button#followees.pure-button.button-primary(href='/followees/#{user_id}') Followees
+          button#followers.pure-button.button-primary(href='/followers/#{user_id}') Followers
       each item in json
         div.linkcontainer
           div.leftsidehome
