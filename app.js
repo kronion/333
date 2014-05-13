@@ -64,7 +64,7 @@ app.use(function (req, res, next) {
   }
   else {
     // Hardcoded port conversion, remove for live deployment
-    var new_url = 'https://' + req.headers.host.slice(0, -5) + ':8443' + req.url;
+    var new_url = 'https://' + req.headers.host + req.url;
     res.redirect(new_url);
   }
 });

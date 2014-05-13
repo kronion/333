@@ -40,7 +40,7 @@ module.exports = function(app, client, cql, bcrypt) {
   passport.use(new FacebookStrategy({
       clientID: "656697897711155",
       clientSecret: "da59fa7c8e4cc617c40793b45ac31b97",
-      callbackURL: "https://localhost:8443/auth/facebook/callback"
+      callbackURL: "https://ec2-54-86-139-98.compute-1.amazonaws.com/auth/facebook/callback"
     },
     function(accessToken, refreshToken, profile, done) {
       // asynchronous verification, for effect...

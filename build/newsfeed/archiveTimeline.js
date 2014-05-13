@@ -7,7 +7,7 @@ $('.archive').each(function(index, element) {
       type:  'POST',
       data:  JSON.stringify(data),
       contentType:  'application/json',
-      url: 'https://localhost:8443/addLink'
+      url: '/addLink'
     });
   });
 });

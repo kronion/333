@@ -33,7 +33,7 @@ r.batchedUpdates(n,s)}};t.exports=i},{"./EventPluginHub":16,"./ReactUpdates":69}
       type:  'POST',
       data:  JSON.stringify(data),
       contentType:  'application/json',
-      url: 'https://localhost:8443/addLink'
+      url: '/addLink'
     });
   });
 });
@@ -2715,7 +2715,7 @@ $.widget( "ui.menu", {
 };$(function() {
   var searchCache = [];
   var id;
-  $.getJSON("https://localhost:8443/autocomp", function (data) {
+  $.getJSON("/autocomp", function (data) {
     for (var i = 0; i < data.length; i++) {
       searchCache.push(data[i]);
     }
@@ -2761,9 +2761,9 @@ $.widget( "ui.menu", {
     }
     $.ajax({
       type: 'HEAD',
-      url: 'https://localhost:8443/pages/' + id,
+      url: '/pages/' + id,
       success: function() {
-        document.location.href = 'https://localhost:8443/pages/' + id;
+        document.location.href = '/pages/' + id;
       },
       error: function() {
         var color = $('#autocomplete').css('border-color');
