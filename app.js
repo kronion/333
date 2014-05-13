@@ -251,15 +251,10 @@ app.post('/signup', function(req, res) {
             console.log(err);
           }
           else {
-            var bloom = new BloomFilter(
-              32 * 256,
-              16
-            );
-            var json = JSON.stringify([].slice.call(bloom.buckets));
-            query = 'INSERT INTO users (user_id, email, first_name, image, last_name, password, ver_code, verified, filter) values (?,?,?,?,?,?,?,?,?)';
+            query = 'INSERT INTO users (user_id, email, first_name, image, last_name, password, ver_code, verified) values (?,?,?,?,?,?,?,?)';
             params = [user_id, req.body.email, req.body.first_name, 
                       strings.anonymous, req.body.last_name, hash, ver_code, 
-                      false, json];
+                      false];
             client.executeAsPrepared(query, params, cql.types.consistencies.one, 
                                      function (err) {
               if (err) {

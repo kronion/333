@@ -64,9 +64,13 @@ module.exports = function(app, client, cql, bcrypt) {
           else {
             var user_id = cql.types.uuid();
 
-            var query2 = 'INSERT INTO users (user_id, fbid, email, first_name, last_name) values (?, ?, ?, ?, ?)';
+            var query2 = 'INSERT INTO users (user_id, fbid, email, first_name, image, last_name) values (?, ?, ?, ?, ?, ?)';
 
-            client.executeAsPrepared(query2, [user_id, profile.id, profile.username, profile.name.givenName, profile.name.familyName], cql.types.consistencies.one, function(err, result) {
+            client.executeAsPrepared(query2, [user_id, profile.id, profile.username,
+                                     profile.name.givenName, strings.anonymous, 
+                                     profile.name.familyName], 
+                                     cql.types.consistencies.one, 
+                                     function(err, result) {
               if (err) {
                 return done(err);
               }
