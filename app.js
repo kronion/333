@@ -92,9 +92,6 @@ app.use(express.static(__dirname + '/public'));
 /* bcrypt for password encryption */
 var bcrypt = require('bcrypt');
 
-/* Bloom filters for efficient querying */
-var BloomFilter = require('bloomfilter').BloomFilter;
-
 /* Passport */
 var passport = require('./routes/authenticate.js')(app, client, cql, bcrypt);
 
