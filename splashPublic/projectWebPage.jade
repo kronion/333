@@ -22,6 +22,10 @@ html(lang='en')
             h4
               a(href='#about') About
             h4
+              a(href='#design') Design
+            h4
+              a(href='#followers') Followers
+            h4
               a(href='#faq') FAQs
     script(type="text/javascript") $(document).ready(function() {$('#nav').localScroll({duration:600});});
     div.splashPage
@@ -56,6 +60,7 @@ html(lang='en')
               p
                 img(src="img/temporarySplash.jpg" style="width: 100%; height: 400px")
           div(style="clear:both")
+        div.hr-new
       div.grey-primary(id="about")
         div.content-modified
           div(style="padding:35px 100px 20px 100px")
@@ -64,7 +69,8 @@ html(lang='en')
             p
                 | Image of entire newsfeed
                 img(src="img/temporarySplash.jpg" style="width: 100%; height: 400px")
-      div.grey-primary
+        div.hr-new
+      div.grey-primary(id="design")
         div.content-modified
           div.leftside
             div.padded
@@ -77,7 +83,8 @@ html(lang='en')
               p.larger-font 'Chive offers a revolutionary design, featuring the comments on a particular link to the right, instead of below everything. 
               p.larger-font We put the focus equally on the link as the discussion pertaining to the link.
           div(style="clear:both")
-      div.grey-primary
+        div.hr-new
+      div.grey-primary(id="followers")
         div.content-modified
           div.leftside
             br
@@ -93,6 +100,27 @@ html(lang='en')
         div.hr-new
       div.grey-primary(id="faq")
         div.content-modified
-          div(style="padding:20px")
-            p. 
-              warg warg warg          
+          div(style="padding:20px 80px 10px 80px")
+            p.question What do I need to make an account?
+            p 
+              | All you need to is to enter your first and last name, email, and password on 
+              a(href="#fakerightnow") this
+              |  page and then verify your email. Once you've done that, all you need to do is log in and you're ready to start using 'Chive
+            p.question How do I add an article to my archive?
+            p Simply make sure you're logged into 'Chive and on your homepage. At the top of the page should be text box saying "Share this!" Simply copy and paste your URL into the box and your URL has been saved!
+            p.question How can I access my archive?
+            p Click on your name at the top of any page on 'Chive's website and you'll be brought to your profile page containing all your saved archives.
+            p.question How can I access other people's archives?
+            p At the top of the page, start typing in the person's email where it says "Looking for something?" Click search and you'll be brought to their profile page with all their archived content.
+            p.question Is it possible for me to discuss content I post with my friends?
+            p Yes! 'Chive allows you to comment on different archived content and have discussions with your friends about what you have posted.
+            p.question I have suggestions for improvements to your awesome website! Where can I submit them?
+            p
+              | Great! We'd love to hear your suggestions! Send us an email at 
+              a(href="mailto:chivecontact@gmail.com") chivecontact@gmail.com
+              |  .
+    div.pure-g-r.footer-me
+      div.pure-u-3-4.banner-inner
+        div.footer-nav
+          div
+            h4 'Chive &#169 2014

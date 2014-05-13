@@ -83,7 +83,7 @@ hr {
   float: left;
 }
 .padded {
-  margin: 20px;
+  margin: 35px;
 }
 .relative {
   position: relative;
@@ -285,6 +285,34 @@ hr {
   background-image: -moz-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
   background-image: -ms-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
   background-image: -o-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+}
+.question {
+  color: #cc0704;
+}
+.footer-me {
+  display: block;
+  width: 100%;
+  height: 45px;
+  border-radius: 0px;
+  background-color: white;
+  box-shadow: 0px 1px 4px #888;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.footer-nav {
+  height: 45px;
+  text-align: center;
+}
+.footer-nav div {
+  display: inline-block;
+  height: 45px;
+  vertical-align: top;
+  margin-right: 10px;
+  margin-left: 10px;
 }
 /*----------------------------------------------------------------------------*/
 /* Glyphs                                                                     */
