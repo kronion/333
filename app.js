@@ -92,6 +92,9 @@ app.use(express.static(__dirname + '/public'));
 /* bcrypt for password encryption */
 var bcrypt = require('bcrypt');
 
+/* Bloom filters for efficient querying */
+var BloomFilter = require('bloomfilter').BloomFilter;
+
 /* Passport */
 var passport = require('./routes/authenticate.js')(app, client, cql, bcrypt);
 
@@ -250,28 +253,36 @@ app.post('/signup', function(req, res) {
           if (err) {
             console.log(err);
           }
-          query = 'INSERT INTO users (user_id, email, first_name, image, last_name, password, ver_code, verified) values (?,?,?,?,?,?,?,?)';
-          params = [user_id, req.body.email, req.body.first_name, strings.anonymous,
-                    req.body.last_name, hash, ver_code, false];
-          client.executeAsPrepared(query, params, cql.types.consistencies.one, 
-                                   function (err) {
-            if (err) {
-              console.log(err);
-            }
-            else {
-              app.mailer.send('email', {
-                to: req.body.email,
-                subject:  'Welcome to \'Chive',
-                ver_code: ver_code
-              }, function (err) {
-                if (err) {
-                  console.error(err);
-                }
-              });
-              response.value=3;
-              res.send(response);
-            }
-          });
+          else {
+            var bloom = new BloomFilter(
+              32 * 256,
+              16
+            );
+            var json = JSON.stringify([].slice.call(bloom.buckets));
+            query = 'INSERT INTO users (user_id, email, first_name, image, last_name, password, ver_code, verified, filter) values (?,?,?,?,?,?,?,?,?)';
+            params = [user_id, req.body.email, req.body.first_name, 
+                      strings.anonymous, req.body.last_name, hash, ver_code, 
+                      false, json];
+            client.executeAsPrepared(query, params, cql.types.consistencies.one, 
+                                     function (err) {
+              if (err) {
+                console.log(err);
+              }
+              else {
+                app.mailer.send('email', {
+                  to: req.body.email,
+                  subject:  'Welcome to \'Chive',
+                  ver_code: ver_code
+                }, function (err) {
+                  if (err) {
+                    console.error(err);
+                  }
+                });
+                response.value=3;
+                res.send(response);
+              }
+            });
+          }
         });
       }
     }
@@ -339,7 +350,7 @@ app.post('/comments/:id', function(req, res) {
 
 app.get('/autocomp', function(req,res) {
   var search =[];
-  var query = 'SELECT email FROM users';
+  var query = 'SELECT user_id, first_name, last_name, image FROM users';
   client.executeAsPrepared(query, cql.types.consistencies.one, function(err, result) {
     if (err) {
       console.log(err);
@@ -348,7 +359,11 @@ app.get('/autocomp', function(req,res) {
       var rows = result.rows;
       if (rows[0]) {
         for (var i = 0; i < rows.length; i++) {
-          search[i] = rows[i].email;
+          search[i] = {
+            label: rows[i].first_name + ' ' + rows[i].last_name,
+            user_id: rows[i].user_id,
+            image: rows[i].image 
+          };
         }
       }
       res.send(JSON.stringify(search));

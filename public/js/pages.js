@@ -71,6 +71,108 @@ $(document).mouseup(function (e) {
   container = $('#updates');
   checkHide(container, e);
 });
+;var Comment = React.createClass({
+  render: function() {
+    return (
+      React.DOM.div( { className: 'comment' },
+        React.DOM.span( { className: 'commentAuthor' },
+          this.props.author + ' '
+        ),
+        React.DOM.span( { className: 'actualComment' },
+          this.props.children
+        )
+      )
+    );
+  }
+});
+
+var CommentList = React.createClass({
+  render: function() {
+    var commentNodes = this.props.data.map(function (comment, index) {
+      return (
+        Comment( { key: index, author: comment.author },
+          comment.text
+        )
+      );
+    });
+    return (
+     React.DOM.div( { className: 'commentList' },
+       commentNodes
+     )
+   );
+  }
+});
+
+var CommentBox = React.createClass({
+  loadCommentsFromServer: function() {
+    $.ajax({
+      url: this.props.url,
+      success: function(data) {
+        this.setState({data: data});
+      }.bind(this)
+    });
+  },
+  handleCommentSubmit: function(comment) {
+    var comments = this.state.data;
+    comments.push(comment);
+    this.setState({data: comments});
+    $.ajax({
+      url: this.props.url,
+      type: 'POST',
+      data: comment,
+      success: function(data) {
+        this.setState({data: data});
+      }.bind(this)
+    });
+  },
+  getInitialState: function() {
+    return {data: []};
+  },
+  componentWillMount: function() {
+    this.loadCommentsFromServer();
+    setInterval(this.loadCommentsFromServer, this.props.pollInterval);
+  },
+  render: function() {
+    return (
+      React.DOM.div( { className: 'commentBox' },
+        React.DOM.h3( {}, 'Comments' ),
+        React.DOM.div( { className: 'scrollingPadding' },
+          React.DOM.div( { className: 'scrollingComments' },
+            CommentList( { data: this.state.data } )
+          ),
+          React.DOM.div( { className: 'newCommentPadding' },
+            CommentForm( { onCommentSubmit: this.handleCommentSubmit })
+          )
+        )
+      )
+    );
+  }
+});
+
+var CommentForm = React.createClass({
+  handleSubmit: function() {
+    var text = this.refs.text.getDOMNode().value.trim();
+    this.props.onCommentSubmit({text: text});
+    this.refs.text.getDOMNode().value = '';
+    return false;
+  },
+
+  render: function() {
+    return (
+      React.DOM.form( { classname: 'pure-form', onSubmit: this.handleSubmit },
+        React.DOM.input( { size: '30', type: 'text', placeholder: 'Say something...', ref: 'text' }),
+        React.DOM.input( { className: 'pure-button button-primary', type: 'submit', value: 'Post' })
+      )
+    );
+  }
+});
+
+$('.reactScript').each(function(index, element) {
+  React.renderComponent(
+    CommentBox( { url: '/comments/' + element.id, pollInterval: 2000 }),
+    document.getElementById(element.id)
+  );
+});
 ;/*! jQuery UI - v1.10.4 - 2014-05-01
 * http://jqueryui.com
 * Includes: jquery.ui.core.js, jquery.ui.widget.js, jquery.ui.position.js, jquery.ui.autocomplete.js, jquery.ui.menu.js
@@ -2620,55 +2722,64 @@ $('#follow').click(function(e) {
   });
 });
 ;$(function() {
-  var myvar = [];
-  $.getJSON("https://localhost:8443/autocomp", function(data) {
+  var searchCache = [];
+  var id;
+  $.getJSON("https://localhost:8443/autocomp", function (data) {
     for (var i = 0; i < data.length; i++) {
-      myvar.push(data[i]);
+      searchCache.push(data[i]);
     }
   });
-  $( "#autocomplete" ).autocomplete({
-    source: myvar,
+  $('#autocomplete').on('input', function () {
+    id = undefined;
   });
+  $('#autocomplete').autocomplete({
+    source: searchCache,
+    select: function(e, ui) {
+      id = ui.item.user_id;
+    }
+  })
+  .data('ui-autocomplete')._renderItem = function ( ul, item ) {
+      console.log(item.image);
+      return $('<li>')
+        .append('<a><img style="background-image: url(' + item.image + ')">' + item.label + '</a>')
+        .appendTo(ul);
+  };
 
   // Hover states on the static widgets
-  $( "#dialog-link, #icons li" ).hover(
+  $('#dialog-link, #icons li').hover(
     function() {
-      $( this ).addClass( "ui-state-hover" );
+      $( this ).addClass('ui-state-hover');
     },
     function() {
-      $( this ).removeClass( "ui-state-hover" );
+      $( this ).removeClass('ui-state-hover');
     }
   );
 
-  function checkUrl(url){
-
-  }
-  $( "#searchbutton" ).click(
-    function() {
-      $.ajax({
-        type: 'HEAD',
-        url: 'https://localhost:8443/pages/' + $( '#autocomplete').val(),
-        error: function() {
-          console.log('error');
-          alert('Error');
-        },
-        success: function() {
-          document.location.href = 'https://localhost:8443/pages/' + $( '#autocomplete').val();
+  $('#searchform').submit(function(e) {
+    e.preventDefault();
+    if (typeof id === 'undefined') {
+      for (var i = 0; i < searchCache.length; i++) {
+        console.log(searchCache[i].label);
+        console.log($('#autocomplete').val());
+        console.log('test');
+        if (searchCache[i].label === $('#autocomplete').val()) {
+          id = searchCache[i].user_id;
+          break;
         }
-      });
+      }
     }
-  );
-
-  $( "#searchform").submit(function(event) {
-    event.preventDefault();
     $.ajax({
       type: 'HEAD',
-      url: 'https://localhost:8443/pages/' + $( '#autocomplete').val(),
+      url: 'https://localhost:8443/pages/' + id,
       success: function() {
-        document.location.href = 'https://localhost:8443/pages/' + $( '#autocomplete').val();
+        document.location.href = 'https://localhost:8443/pages/' + id;
       },
       error: function() {
-        alert('Error');
+        var color = $('#autocomplete').css('border-color');
+        $('#autocomplete').css('border-color', '#cc0704');
+        setTimeout(function() {
+          $('#autocomplete').css('border-color', color);
+        }, 2000);
       }
     });
   });

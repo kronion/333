@@ -1,53 +1,62 @@
 $(function() {
-  var myvar = [];
-  $.getJSON("https://localhost:8443/autocomp", function(data) {
+  var searchCache = [];
+  var id;
+  $.getJSON("https://localhost:8443/autocomp", function (data) {
     for (var i = 0; i < data.length; i++) {
-      myvar.push(data[i]);
+      searchCache.push(data[i]);
     }
   });
-  $( "#autocomplete" ).autocomplete({
-    source: myvar,
+  $('#autocomplete').on('input', function () {
+    id = undefined;
   });
+  $('#autocomplete').autocomplete({
+    source: searchCache,
+    select: function(e, ui) {
+      id = ui.item.user_id;
+    }
+  })
+  .data('ui-autocomplete')._renderItem = function ( ul, item ) {
+      console.log(item.image);
+      return $('<li>')
+        .append('<a><img style="background-image: url(' + item.image + ')">' + item.label + '</a>')
+        .appendTo(ul);
+  };
 
   // Hover states on the static widgets
-  $( "#dialog-link, #icons li" ).hover(
+  $('#dialog-link, #icons li').hover(
     function() {
-      $( this ).addClass( "ui-state-hover" );
+      $( this ).addClass('ui-state-hover');
     },
     function() {
-      $( this ).removeClass( "ui-state-hover" );
+      $( this ).removeClass('ui-state-hover');
     }
   );
 
-  function checkUrl(url){
-
-  }
-  $( "#searchbutton" ).click(
-    function() {
-      $.ajax({
-        type: 'HEAD',
-        url: 'https://localhost:8443/pages/' + $( '#autocomplete').val(),
-        error: function() {
-          console.log('error');
-          alert('Error');
-        },
-        success: function() {
-          document.location.href = 'https://localhost:8443/pages/' + $( '#autocomplete').val();
+  $('#searchform').submit(function(e) {
+    e.preventDefault();
+    if (typeof id === 'undefined') {
+      for (var i = 0; i < searchCache.length; i++) {
+        console.log(searchCache[i].label);
+        console.log($('#autocomplete').val());
+        console.log('test');
+        if (searchCache[i].label === $('#autocomplete').val()) {
+          id = searchCache[i].user_id;
+          break;
         }
-      });
+      }
     }
-  );
-
-  $( "#searchform").submit(function(event) {
-    event.preventDefault();
     $.ajax({
       type: 'HEAD',
-      url: 'https://localhost:8443/pages/' + $( '#autocomplete').val(),
+      url: 'https://localhost:8443/pages/' + id,
       success: function() {
-        document.location.href = 'https://localhost:8443/pages/' + $( '#autocomplete').val();
+        document.location.href = 'https://localhost:8443/pages/' + id;
       },
       error: function() {
-        alert('Error');
+        var color = $('#autocomplete').css('border-color');
+        $('#autocomplete').css('border-color', '#cc0704');
+        setTimeout(function() {
+          $('#autocomplete').css('border-color', color);
+        }, 2000);
       }
     });
   });
