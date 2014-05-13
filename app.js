@@ -17,6 +17,7 @@
 /* File system */
 var fs = require('fs');
 var path = require('path');
+var async = require('async');
 
 /* HTTP and HTTPS */
 var http = require('http');
@@ -359,6 +360,80 @@ app.get('/autocomp', function(req,res) {
         }
       }
       res.send(JSON.stringify(search));
+    }
+  });
+});
+
+app.get('/followees/:user_id', function (req, res) {
+  var followees = [];
+  var query = 'SELECT * FROM followees WHERE user_id=?';
+  client.executeAsPrepared(query, [req.params.user_id], cql.types.consistencies.one, function (err, result) {
+    if (err) {
+      console.error(err);
+    }
+    else {
+      var rows = result.rows;
+      if (rows[0]) {
+        query = 'SELECT * FROM users WHERE user_id=?';
+        async.forEach(rows, function(row, done) {
+          client.executeAsPrepared(query, [row.followee_id], cql.types.consistencies.one, function(err, result) {
+            if (err) {
+              console.error(err);
+            }
+            else {
+              rows = result.rows;
+              if (rows[0]) {
+                followees.push(rows[0].first_name + ' ' + rows[0].last_name);
+              }
+            }
+            done();
+          });
+        }, function (err) {
+          if (err) {
+            console.log(err);
+          }
+          else {
+            res.send(followees);
+          }
+        });
+      }
+    }
+  });
+});
+
+app.get('/followers/:user_id', function (req, res) {
+  var followers = [];
+  var query = 'SELECT * FROM followers WHERE user_id=?';
+  client.executeAsPrepared(query, [req.params.user_id], cql.types.consistencies.one, function (err, result) {
+    if (err) {
+      console.error(err);
+    }
+    else {
+      var rows = result.rows;
+      if (rows[0]) {
+        query = 'SELECT * FROM users WHERE user_id=?';
+        async.forEach(rows, function(row, done) {
+          client.executeAsPrepared(query, [row.follower_id], cql.types.consistencies.one, function(err, result) {
+            if (err) {
+              console.error(err);
+            }
+            else {
+              rows = result.rows;
+              if (rows[0]) {
+                followers.push(rows[0].first_name + ' ' + rows[0].last_name);
+              }
+            }
+            done();
+          });
+        }, function (err) {
+          if (err) {
+            console.log(err);
+          }
+          else {
+            res.send(followers);
+          }
+        });
+      }
     }
   });
 });
