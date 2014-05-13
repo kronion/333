@@ -30,24 +30,6 @@ function existingEmail() {
   $('#signup input[name=email]').focus();
 }
 
-// (Hopefully) fixes the HTML5 Form Verification Problem with Safari
-function hasHtml5Validation () {
-  return typeof document.createElement('input').checkValidity === 'function';
-}
- 
-if (hasHtml5Validation()) {
-  $('.validate-form').submit(function (e) {
-    if (!this.checkValidity()) {
-      e.preventDefault();
-      $(this).addClass('invalid');
-      $('#status').html('invalid');
-    } else {
-      $(this).addClass('valid');
-      $('#status').html('submitted');
-    }
-  });
-}
-
 $('#signup').submit(function(e) {
   e.preventDefault();
   var inputs = $('#signup input');
