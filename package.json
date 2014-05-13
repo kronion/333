@@ -13,6 +13,7 @@
     "url": "https://github.com/kronion/333.git"
   },
   "dependencies": {
+    "bcrypt": "^0.7.8",
     "cheerio": "^0.15.0",
     "connect-busboy": "0.0.1",
     "connect-cassandra-cql": "~0.1.2",
@@ -35,7 +36,6 @@
     "grunt-contrib-concat": "^0.4.0",
     "grunt-contrib-jshint": "~0.8.0",
     "grunt-contrib-less": "^0.11.0",
-    "grunt-contrib-uglify": "^0.4.0",
     "grunt-contrib-watch": "~0.5.3"
   }
 }

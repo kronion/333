@@ -118,6 +118,14 @@ hr {
   background-color: @grey-secondary;
 }
 
+input {
+  i-webkit-transition: border-color 0.5s ease-in;
+  -moz-transition: border-color 0.5s ease-in;
+  -ms-transition: border-color 0.5s ease-in;
+  -o-transition: border-color 0.5s ease-in;
+  transition: border-color 0.5s ease-in;
+}
+
 .pure-form .button-primary {
   margin-left: 4px;
 }
@@ -223,10 +231,10 @@ hr {
     .right;
     .no-margins;
     input:focus:invalid {
-      border-color: @red-secondary !important;
+      border-color: @red-secondary;
     }
     input:focus:valid {
-      border-color: @blue-primary !important;
+      border-color: @blue-primary;
     }
   }
   .input {
@@ -267,6 +275,20 @@ hr {
   margin-left: 30px;
   form {
     float: none;
+  }
+}
+
+.ui-menu-item {
+  img {
+    height: 30px;
+    width: 30px;
+    
+    margin-right: 10px;
+
+    background-size: cover;
+    background-position: center;
+
+    vertical-align: bottom;
   }
 }
 

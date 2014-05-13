@@ -11,6 +11,7 @@ pem_key
 uploadCreds.js
 deleteCreds.js
 creds.zip
+aws
 
 # Email Credentials
 email.js

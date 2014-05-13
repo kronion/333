@@ -94,10 +94,9 @@ var CommentForm = React.createClass({
   }
 });
 
-var myScript = document.getElementById('myScript');
-var myId = myScript.parentNode.id;
-
-React.renderComponent(
-  CommentBox( { url: '/comments/' + myId, pollInterval: 2000 }),
-  document.getElementById(myId)
-);
+$('.reactScript').each(function(index, element) {
+  React.renderComponent(
+    CommentBox( { url: '/comments/' + element.id, pollInterval: 2000 }),
+    document.getElementById(element.id)
+  );
+});

@@ -8,7 +8,7 @@ module.exports = function(client, cql) {
       if(err) {
         // console.log(err);
         // Should redirect to a search page
-        res.redirect('/');
+        res.send(404);
       }
       else {
         var rows = result.rows;
@@ -35,7 +35,7 @@ module.exports = function(client, cql) {
             row = result.rows[0];
             if (!row) {
               // Should redirect to a search page
-              res.redirect('/');
+              res.send(404);
             }
             else {
               var image = row.image;
