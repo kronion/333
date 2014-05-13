@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>333 by kronion</title>
+    <title>'Chive Timeline</title>
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -31,15 +31,12 @@
 
       <section>
         <div id="title">
-          <h1>333</h1>
+          <h1>'Chive Timeline</h1>
           <p>Final project for COS 333 Spring 2014</p>
           <hr>
           <span class="credits left">Project maintained by <a href="https://github.com/kronion">kronion</a></span>
           <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
         </div>
-
-        <h1>
-<a name="cos-333-project" class="anchor" href="#cos-333-project"><span class="octicon octicon-link"></span></a>COS 333 Project</h1>
 
 <h3>
 <a name="authors" class="anchor" href="#authors"><span class="octicon octicon-link"></span></a>Authors</h3>
@@ -149,7 +146,7 @@ Currently, the URL submit assumes that you already have an "HTTP" at the beginni
 <p>Continued to work on the navigation bar and also switched from HTML/CSS to Jade/LESS, making things easier to write and also in preparation for our homepage.</p>
 
 <h2>April 14</h2>
-<p>Started a backend overhaul, moving from a push to a pull model for easier implementation. Might make things a bit slower, but that's okay for us and for demo purposes. Makes for an easier, cleaner implementation. Worked on the follower/followee list.</p>
+<p>Started a backend overhaul, moving from a pull to a push model for easier implementation. Might make things a bit slower, but that's okay for us and for demo purposes. Makes for an easier, cleaner implementation. Worked on the follower/followee list.</p>
 
 <h2>April 15</h2>
 <p>Finished the bookmarklet, save for a few parts that will need to be finialized when we have the final product. Continued working on Facebook integration and uitilizing the API and information we get from them.</p>
@@ -161,13 +158,13 @@ Currently, the URL submit assumes that you already have an "HTTP" at the beginni
 <p>Another weekly meeting. Discussed changing our name from "Blabrr" since that's hard to spell and seems to counterintuittive to what we want this project to be about. Talked about how we want to work on the "social" aspect, such as commenting and liking different links. Also discussed our newsfeed ranking and our ideas for that. We are probably going to do a Twitter/edge rank algorithm with an exponential decay, plus utilize the comments.</p>
 
 <h2>April 19</h2>
-<p>Pulled in and worked on merging all the different portions of code on different computers. Working on fixing merge conflicts.</p>
+<p>Pulled in and worked on merging all the different portions of code on different computers. Working on fixing merge conflicts. Finished Facebook login.</p>
 
 <h2>April 20</h2>
 <p>Made our own website scrapper to grab title, images, first paragraph, etc. We were going to someone else's code but would have had to start paying after a small amount of usage.</p>
 
 <h2>April 22</h2>
-<p>Bookmarklet pretty much finalized. Continued work on comments, almost finished, just need a little more work. Should be like real-time, Facebook commenting when finished.</p>
+<p>Bookmarklet no longer works after pulling in changes to database schema--can no longer use GET request. Continued work on comments, almost finished, just need a little more work. Should be like real-time, Facebook commenting when finished.</p>
 
 <h2>April 23</h2>
 <p>Finished navbar, part of profile page, error in login, and login page. Talked about a unified format for all pages so that there aren't big differences.</p>
@@ -189,6 +186,7 @@ Currently, the URL submit assumes that you already have an "HTTP" at the beginni
 
 <h2>April 30</h2>
 <p>We can now add comments to links in real time! Now working on merging versions we each have on our seaprate computers to all work together. Discussed and started working on the issue where you shouldn't be able to access certain pages or certain parts of pages (such as a newsfeed when you aren't logged in, editted a profile page when it's not your profile, etc.). We will continue working on this in the next week.</p>
+<p>Trying to figure out how to make a POST request from another page for bookmarklet. Looking into request module.</p>
 
 <h2>May 1</h2>
 <p>Added the functionality to add someone else's link from the newsfeed to your own archive! After a lot of fighting with the necessary tools, we are able to upload our own profile pictures and change them. You still need to refresh the page to do so, but we are working on this.</p>
@@ -212,15 +210,20 @@ Currently, the URL submit assumes that you already have an "HTTP" at the beginni
 <p>Reformatted how the comments look (red email followed by black actual comment). Finished the profile page and made sure that everything works for our demo!</p>
 
 <h2>May 9 - Demo Day</h2>
-<p>Cleaned up some of the packages we had that we weren't using fully. Cleaned up some features that we didn't have time to do before.</p>
+<p>Cleaned up some of the packages we had that we weren't using fully. Cleaned up some features that we didn't have time to do before. Found out that the HTML5 form requirement doesn't work on Safari, so you can submit an empty form in Safari, even if we think we are checking for this. Going to have to do some research to find a way to fix this known problem with Safari.</p>
 
 <h2>May 10</h2>
 <p>Cleaned all the Javascript in the public folder and organized it in a new build folder that's watched by a Grunt script which concatenates the Javascript when we make a change. Basically, concatenated for each page so that you only have to access one script per page. Removed dependency when using React.</p>
 
 <h2>May 11</h2>
-<p>Began writing and compiling information for our documentation we have to turn in. We also made our webpage to entice people to our site! We made a logo (kind of, needs to be worked on...).</p>
+<p>Began writing and compiling information for our documentation we have to turn in. We also made our webpage to entice people to our site! We also made a logo.</p>
 <p>JSX dependency removal. Switched all of our script paths to absolute paths, removing seven Jade files. Basically, making our program run faster.</p>
 
+<h2>May 12</h2>
+<p>Attempted a fix to the HTML5 issue with Safari; still need to test it out. Encrypted passwords server side for better security. Fixed the search bar so that you can search for users with autocomplete and see their profile pictures in the search options. Changed how the comments.js script was called, making it more efficient.</p>
+
+<h2>May 13</h2>
+<p>Finished up followers/followees page, just displaying everyone that follows that user and who that user follows respectively. Finished up documentation to turn in and finialized our splash page with screenshots of our website.</p>
       </section>
 
     </div>
