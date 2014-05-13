@@ -17,7 +17,7 @@ html(lang="en")
           div.leftsidehome
             center
               h3
-                a(href='/pages/'+item.id) #{user}
+                a(href='/pages/'+item.owner_id) #{user}
               h2= item.title
               a(href=item.url)
                 div(style='height: 200px; width: 400px; background-image: url(#{item.image}); background-size: cover; background-position: center')
