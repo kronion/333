@@ -100,6 +100,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.locals({
   title: '\'Chive',
+  domain: 'ec2-54-86-204-54.compute-1.amazonaws.com',
   flash: {}
 });
 
