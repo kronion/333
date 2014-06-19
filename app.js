@@ -28,8 +28,7 @@ var certificate = fs.readFileSync('server.crt', 'utf8');
 var pem_key = fs.readFileSync('pem_key', 'utf8');
 var credentials = {
   key: privateKey,
-  cert: certificate,
-  passphrase: pem_key
+  cert: certificate, passphrase: pem_key
 };
 
 /* Large string variables */
@@ -95,6 +94,9 @@ var bcrypt = require('bcrypt');
 /* Passport */
 var passport = require('./routes/authenticate.js')(app, client, cql, bcrypt);
 
+/* request */
+var request = require('request');
+
 /* Jade templating */
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -106,6 +108,7 @@ app.locals({
 
 /* Routing */
 var followers = require('./routes/followers.js')(client, cql);
+var bookmarklet = require('./routes/bookmarklet.js')(client, cql);
 var footer = require('./routes/footer.js')();
 var home = require('./routes/home.js')(client, cql);
 var pages = require('./routes/pages.js')(client, cql);
@@ -122,8 +125,14 @@ app.get('/help', footer.help);
 /* Add follower */
 app.post('/addFollower/:user_id', followers.addFollower);
 
+<<<<<<< HEAD
+/* For bookmarklet purposes: adding a link via GET request */
+app.get('/bookmark/:uri_enc', bookmarklet);
+// app.post('/removeLink', followers.removeLink);
+=======
 /* Remove follower */
 app.post('/removeFollower/:user_id', followers.removeFollower);
+>>>>>>> 32662746681bc0b1f6a2ccb57bdb69321fd96ff0
 
 /* Add link */
 app.post('/addLink', followers.addLink);
@@ -369,3 +378,4 @@ var httpServer = http.createServer(app);
 var httpsServer = https.createServer(credentials, app);
 httpServer.listen(8080);
 httpsServer.listen(8443);
+
